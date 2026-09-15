@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Paleta de colores principal -->
+    <color name="primary">#00236F</color>
+    <color name="primary_container">#1E3A8A</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="on_primary_container">#90A8FF</color>
+
+    <!-- Secundarios -->
+    <color name="secondary">#006398</color>
+    <color name="secondary_container">#5BB8FE</color>
+    <color name="on_secondary">#FFFFFF</color>
+
+    <!-- Fondos y superficies -->
+    <color name="background">#F7F9FB</color>
+    <color name="surface">#F7F9FB</color>
+    <color name="surface_container_lowest">#FFFFFF</color>
+    <color name="surface_container_low">#F2F4F6</color>
+    <color name="surface_container_high">#E6E8EA</color>
+    <color name="on_surface">#191C1E</color>
+    <color name="on_surface_variant">#444651</color>
+
+    <!-- Estados, Bordes y Errores -->
+    <color name="outline">#757682</color>
+    <color name="outline_variant">#C5C5D3</color>
+    <color name="error">#BA1A1A</color>
+    <color name="error_container">#FFDAD6</color>
+    <color name="on_error">#FFFFFF</color>
+    <color name="on_error_container">#93000A</color>
+
+    <!-- Colores auxiliares para KPI / Estado -->
+    <color name="success_green">#1E8E3E</color>
+    <color name="success_green_container">#E6F4EA</color>
+    <color name="warning_amber">#F9AB00</color>
+    <color name="warning_amber_container">#FEF7E0</color>
+</resources>

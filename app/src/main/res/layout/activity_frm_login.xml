@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true"
+    tools:context=".frm_login">
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_horizontal"
+      android:orientation="vertical"
+      android:padding="24dp">
+
+    <!-- 1. HEADER (Logo, Título y Subtítulo) -->
+    <LinearLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:background="@color/primary_container"
+        android:gravity="center">
+
+      <ImageView
+          android:layout_width="28dp"
+          android:layout_height="28dp"
+          android:contentDescription="Icono Dominio"
+          android:src="@drawable/ic_domain"
+          app:tint="@color/on_primary" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="¡Bienvenido! 👋"
+        android:textColor="@color/on_surface"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Inicia sesión para continuar"
+        android:textColor="@color/on_surface_variant"
+        android:textSize="14sp" />
+
+    <!-- 2. FORMULARIO -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:orientation="vertical">
+
+      <!-- Campo Correo Electrónico -->
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="4dp"
+          android:text="Correo electrónico"
+          android:textColor="@color/on_surface"
+          android:textSize="12sp"
+          android:textStyle="bold" />
+
+      <com.google.android.material.textfield.TextInputLayout
+          android:id="@+id/tilEmail"
+          style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:boxCornerRadiusBottomEnd="8dp"
+          app:boxCornerRadiusBottomStart="8dp"
+          app:boxCornerRadiusTopEnd="8dp"
+          app:boxCornerRadiusTopStart="8dp"
+          app:boxStrokeColor="@color/primary"
+          app:startIconDrawable="@drawable/ic_mail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/txtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ejemplo@dominio.com"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/on_surface"
+            android:textSize="14sp" />
+      </com.google.android.material.textfield.TextInputLayout>
+
+      <!-- Campo Contraseña -->
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="16dp"
+          android:layout_marginBottom="4dp"
+          android:text="Contraseña"
+          android:textColor="@color/on_surface"
+          android:textSize="12sp"
+          android:textStyle="bold" />
+
+      <com.google.android.material.textfield.TextInputLayout
+          android:id="@+id/tilPassword"
+          style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:boxCornerRadiusBottomEnd="8dp"
+          app:boxCornerRadiusBottomStart="8dp"
+          app:boxCornerRadiusTopEnd="8dp"
+          app:boxCornerRadiusTopStart="8dp"
+          app:boxStrokeColor="@color/primary"
+          app:passwordToggleEnabled="true"
+          app:startIconDrawable="@drawable/ic_lock">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/txtContrasena"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="••••••••"
+            android:inputType="textPassword"
+            android:textColor="@color/on_surface"
+            android:textSize="14sp" />
+      </com.google.android.material.textfield.TextInputLayout>
+
+      <!-- Enlace ¿Olvidaste tu contraseña? -->
+      <TextView
+          android:id="@+id/tvForgotPassword"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="end"
+          android:layout_marginTop="8dp"
+          android:onClick="recuperarContrasena"
+          android:text="¿Olvidaste tu contraseña?"
+          android:textColor="@color/secondary"
+          android:textSize="12sp"
+          android:textStyle="bold" />
+
+      <!-- Botón Iniciar Sesión -->
+      <com.google.android.material.button.MaterialButton
+          android:id="@+id/btnLogin"
+          android:layout_width="match_parent"
+          android:layout_height="50dp"
+          android:layout_marginTop="24dp"
+          android:backgroundTint="@color/primary_container"
+          android:onClick="iniciarSesion"
+          android:text="Iniciar sesión"
+          android:textAllCaps="false"
+          android:textColor="@color/on_primary"
+          android:textSize="16sp"
+          app:cornerRadius="8dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+      <View
+          android:layout_width="0dp"
+          android:layout_height="1dp"
+          android:layout_weight="1"
+          android:background="@color/outline_variant" />
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="12dp"
+          android:layout_marginEnd="12dp"
+          android:text="O CONTINUAR CON"
+          android:textColor="@color/outline"
+          android:textSize="11sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="0dp"
+          android:layout_height="1dp"
+          android:layout_weight="1"
+          android:background="@color/outline_variant" />
+    </LinearLayout>
+
+    <!-- 4. BOTÓN GOOGLE SSO -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnGoogle"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="24dp"
+        android:onClick="iniciarConGoogle"
+        android:text="Google"
+        android:textAllCaps="false"
+        android:textColor="@color/on_surface"
+        android:textSize="16sp"
+        app:cornerRadius="8dp"
+        app:icon="@drawable/ic_google"
+        app:iconGravity="textStart"
+        app:iconPadding="12dp"
+        app:iconSize="20dp"
+        app:strokeColor="@color/outline_variant" />
+
+    <!-- 5. PIE DE PÁGINA (Ir a Registro) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal">
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="¿No tienes cuenta? "
+          android:textColor="@color/on_surface_variant"
+          android:textSize="14sp" />
+
+      <TextView
+          android:id="@+id/tvRegister"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:onClick="Registro"
+          android:text="Regístrate"
+          android:textColor="@color/primary"
+          android:textSize="14sp"
+          android:textStyle="bold" />
+    </LinearLayout>
+
+  </LinearLayout>
+</ScrollView>
