@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".frm_estadisticas">
+    tools:context=".vista.frm_estadisticas">
 
     <!-- 1. ENCABEZADO FIJO -->
     <RelativeLayout

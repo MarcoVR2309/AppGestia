@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".frm_configuracion">
+    tools:context=".vista.frm_configuracion">
 
     <!-- 1. ENCABEZADO FIJO -->
     <RelativeLayout

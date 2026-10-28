@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -12,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MaquetaGestia">
         <activity
-            android:name=".frm_splash"
+            android:name=".vista.frm_splash"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -22,47 +24,47 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".frm_login"
+            android:name=".vista.frm_login"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".MainActivity"
+            android:name=".vista.MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".frm_registro"
+            android:name=".vista.frm_registro"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".frm_notificaciones"
+            android:name=".vista.frm_notificaciones"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".frm_proyectos"
+            android:name=".vista.frm_proyectos"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".frm_detalle_proyecto"
+            android:name=".vista.frm_detalle_proyecto"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".frm_estadisticas"
+            android:name=".vista.frm_estadisticas"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".frm_perfil"
+            android:name=".vista.frm_perfil"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".frm_configuracion"
+            android:name=".vista.frm_configuracion"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".frm_tareas"
+            android:name=".vista.frm_tareas"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".frm_equipo"
+            android:name=".vista.frm_equipo"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

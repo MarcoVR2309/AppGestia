@@ -1,4 +1,4 @@
-package com.example.maquetagestia;
+package com.example.maquetagestia.vista;
 
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.maquetagestia.R;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class frm_configuracion extends AppCompatActivity {

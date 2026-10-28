@@ -1,4 +1,4 @@
-package com.example.maquetagestia;
+package com.example.maquetagestia.vista;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,8 +12,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.maquetagestia.R;
+import com.example.maquetagestia.conexion.conSQLServer;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.sql.Connection;
 
 public class frm_login extends AppCompatActivity {
     private TextInputEditText email, contrasena;
@@ -29,14 +33,33 @@ public class frm_login extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         email = findViewById(R.id.txtEmail);
         contrasena = findViewById(R.id.txtContrasena);
         login = findViewById(R.id.btnLogin);
         google = findViewById(R.id.btnGoogle);
         forgotPassword = findViewById(R.id.tvForgotPassword);
         registro = findViewById(R.id.tvRegister);
+        probarConexionSQLServer();
     }
 
+    private void probarConexionSQLServer() {
+        new Thread(() -> {
+            conSQLServer conexionHelper = new conSQLServer();
+            Connection con = conexionHelper.conectar();
+
+            runOnUiThread(() -> {
+                if (con != null) {
+                    Toast.makeText(frm_login.this, "¡Conexión exitosa a la base de datos GESTIA!", Toast.LENGTH_LONG).show();
+                    try {
+                        con.close();
+                    } catch (Exception ignored) {}
+                } else {
+                    Toast.makeText(frm_login.this, "Error al conectar con SQL Server. Revisa IP, puerto o credenciales.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }).start();
+    }
     public void iniciarSesion(View view){
         String txtEmail = email.getText().toString();
         String txtPass = contrasena.getText().toString();
