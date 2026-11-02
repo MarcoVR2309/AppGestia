@@ -12,12 +12,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.maquetagestia.R;
+import com.example.maquetagestia.controller.Sesion;
 
 public class frm_perfil extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_frm_perfil);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -26,6 +28,7 @@ public class frm_perfil extends AppCompatActivity {
             return insets;
         });
     }
+
     public void volverAlHome(View view) {
         finish();
     }
@@ -36,6 +39,7 @@ public class frm_perfil extends AppCompatActivity {
     }
 
     public void cerrarSesion(View view) {
+        Sesion.cerrar(this);
         Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, frm_login.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -34,29 +34,69 @@ public class Notificacion {
         this.fechaGeneracion = fechaGeneracion;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(String usuarioId) { this.usuarioId = usuarioId; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public String getUsuarioId() {
+        return usuarioId;
+    }
 
-    public String getMensaje() { return mensaje; }
-    public void setMensaje(String mensaje) { this.mensaje = mensaje; }
+    public void setUsuarioId(String usuarioId) {
+        this.usuarioId = usuarioId;
+    }
 
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
+    public String getTitulo() {
+        return titulo;
+    }
 
-    public String getReferenciaId() { return referenciaId; }
-    public void setReferenciaId(String referenciaId) { this.referenciaId = referenciaId; }
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 
-    public boolean isLeido() { return leido; }
-    public void setLeido(boolean leido) { this.leido = leido; }
+    public String getMensaje() {
+        return mensaje;
+    }
 
-    public String getFechaGeneracion() { return fechaGeneracion; }
-    public void setFechaGeneracion(String fechaGeneracion) { this.fechaGeneracion = fechaGeneracion; }
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public String getReferenciaId() {
+        return referenciaId;
+    }
+
+    public void setReferenciaId(String referenciaId) {
+        this.referenciaId = referenciaId;
+    }
+
+    public boolean isLeido() {
+        return leido;
+    }
+
+    public void setLeido(boolean leido) {
+        this.leido = leido;
+    }
+
+    public String getFechaGeneracion() {
+        return fechaGeneracion;
+    }
+
+    public void setFechaGeneracion(String fechaGeneracion) {
+        this.fechaGeneracion = fechaGeneracion;
+    }
 
     @Override
     public String toString() {

@@ -64,9 +64,8 @@
                 android:id="@+id/txtNombre"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/ic_launcher_background"
                 android:backgroundTint="@color/surface_container_lowest"
-                android:drawableStart="@drawable/ic_mail"
+                android:drawableStart="@drawable/ic_person"
                 android:drawablePadding="12dp"
                 android:hint="Ej. Ana Pérez"
                 android:inputType="textPersonName"
@@ -95,6 +94,31 @@
                 android:drawablePadding="12dp"
                 android:hint="tu@correo.com"
                 android:inputType="textEmailAddress"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/on_surface"
+                android:textSize="14sp" />
+
+            <!-- Teléfono -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:text="Teléfono"
+                android:textColor="@color/on_surface"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/txtTelefono"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:backgroundTint="@color/surface_container_lowest"
+                android:drawableStart="@drawable/ic_phone"
+                android:drawablePadding="12dp"
+                android:hint="+51 987 654 321"
+                android:inputType="phone"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:textColor="@color/on_surface"

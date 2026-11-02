@@ -13,21 +13,34 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.maquetagestia.R;
-import com.example.maquetagestia.conexion.conSQLServer;
+import com.example.maquetagestia.controller.Sesion;
+import com.example.maquetagestia.controller.cUsuario;
+import com.example.maquetagestia.controller.cUsuario.ResultadoLogin;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.sql.Connection;
-
 public class frm_login extends AppCompatActivity {
+
     private TextInputEditText email, contrasena;
     private MaterialButton login, google;
     private TextView forgotPassword, registro;
+    private cUsuario usuarioControlador;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Si la sesión ya está activa, ir directamente al Dashboard
+        if (Sesion.estaActiva(this)) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_frm_login);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -40,40 +53,44 @@ public class frm_login extends AppCompatActivity {
         google = findViewById(R.id.btnGoogle);
         forgotPassword = findViewById(R.id.tvForgotPassword);
         registro = findViewById(R.id.tvRegister);
-        probarConexionSQLServer();
+
+        usuarioControlador = new cUsuario();
     }
 
-    private void probarConexionSQLServer() {
+    public void iniciarSesion(View view) {
+        String txtEmail = email.getText() != null ? email.getText().toString().trim() : "";
+        String txtPass = contrasena.getText() != null ? contrasena.getText().toString().trim() : "";
+
+        if (txtEmail.isEmpty() || txtPass.isEmpty()) {
+            Toast.makeText(this, "Por favor complete correo y contraseña", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Feedback visual
+        login.setEnabled(false);
+        login.setText("Verificando...");
+
         new Thread(() -> {
-            conSQLServer conexionHelper = new conSQLServer();
-            Connection con = conexionHelper.conectar();
+            ResultadoLogin res = usuarioControlador.iniciarSesionEx(txtEmail, txtPass);
 
             runOnUiThread(() -> {
-                if (con != null) {
-                    Toast.makeText(frm_login.this, "¡Conexión exitosa a la base de datos GESTIA!", Toast.LENGTH_LONG).show();
-                    try {
-                        con.close();
-                    } catch (Exception ignored) {}
+                login.setEnabled(true);
+                login.setText("Iniciar sesión");
+
+                if (res.usuario != null) {
+                    Sesion.guardar(frm_login.this, res.usuario);
+                    Toast.makeText(frm_login.this, "¡Bienvenido, " + res.usuario.getNombreCompleto() + "!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(frm_login.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
                 } else {
-                    Toast.makeText(frm_login.this, "Error al conectar con SQL Server. Revisa IP, puerto o credenciales.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(frm_login.this, res.mensajeError, Toast.LENGTH_LONG).show();
                 }
             });
         }).start();
     }
-    public void iniciarSesion(View view){
-        String txtEmail = email.getText().toString();
-        String txtPass = contrasena.getText().toString();
 
-        if(!txtEmail.isEmpty() && !txtPass.isEmpty()){
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }else {
-            Toast.makeText(this, "Por favor complete todos los campos", Toast.LENGTH_LONG).show();
-        }
-    }
     public void Registro(View view) {
-        // Redirige a la pantalla de Registro
         Intent intent = new Intent(this, frm_registro.class);
         startActivity(intent);
     }
@@ -85,5 +102,4 @@ public class frm_login extends AppCompatActivity {
     public void iniciarConGoogle(View view) {
         Toast.makeText(this, "Inicio con Google en desarrollo", Toast.LENGTH_SHORT).show();
     }
-
 }

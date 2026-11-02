@@ -24,20 +24,45 @@ public class ProyectoUsuario {
         this.fechaUnion = fechaUnion;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getProyectoId() { return proyectoId; }
-    public void setProyectoId(String proyectoId) { this.proyectoId = proyectoId; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(String usuarioId) { this.usuarioId = usuarioId; }
+    public String getProyectoId() {
+        return proyectoId;
+    }
 
-    public String getRol() { return rol; }
-    public void setRol(String rol) { this.rol = rol; }
+    public void setProyectoId(String proyectoId) {
+        this.proyectoId = proyectoId;
+    }
 
-    public String getFechaUnion() { return fechaUnion; }
-    public void setFechaUnion(String fechaUnion) { this.fechaUnion = fechaUnion; }
+    public String getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(String usuarioId) {
+        this.usuarioId = usuarioId;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+
+    public String getFechaUnion() {
+        return fechaUnion;
+    }
+
+    public void setFechaUnion(String fechaUnion) {
+        this.fechaUnion = fechaUnion;
+    }
 
     @Override
     public String toString() {

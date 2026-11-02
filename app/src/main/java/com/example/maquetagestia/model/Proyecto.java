@@ -44,29 +44,69 @@ public class Proyecto {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 
-    public String getFechaInicio() { return fechaInicio; }
-    public void setFechaInicio(String fechaInicio) { this.fechaInicio = fechaInicio; }
+    public String getTipo() {
+        return tipo;
+    }
 
-    public String getFechaFinEstimada() { return fechaFinEstimada; }
-    public void setFechaFinEstimada(String fechaFinEstimada) { this.fechaFinEstimada = fechaFinEstimada; }
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
 
-    public String getCreadoPor() { return creadoPor; }
-    public void setCreadoPor(String creadoPor) { this.creadoPor = creadoPor; }
+    public String getEstado() {
+        return estado;
+    }
 
-    public String getCreatedAt() { return createdAt; }
-    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(String fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public String getFechaFinEstimada() {
+        return fechaFinEstimada;
+    }
+
+    public void setFechaFinEstimada(String fechaFinEstimada) {
+        this.fechaFinEstimada = fechaFinEstimada;
+    }
+
+    public String getCreadoPor() {
+        return creadoPor;
+    }
+
+    public void setCreadoPor(String creadoPor) {
+        this.creadoPor = creadoPor;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     @Override
     public String toString() {

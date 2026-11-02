@@ -75,7 +75,7 @@ public class cUsuario {
         Connection con = conexionHelper.conectar();
         if (con != null) {
             try {
-                // 1. Generar el ID con formato 'USU000001'
+                // 1. Generar el ID con formato 'U000001'
                 String idGenerado = generarIdSeguro(con, "Usuario", "id", "U", 6);
                 u.setId(idGenerado);
 
@@ -98,5 +98,55 @@ public class cUsuario {
             }
         }
         return insertado;
+    }
+
+    // Estructura de resultado para autenticación
+    public static class ResultadoLogin {
+        public final Usuario usuario;
+        public final String mensajeError;
+        public final boolean esErrorConexion;
+
+        public ResultadoLogin(Usuario usuario, String mensajeError, boolean esErrorConexion) {
+            this.usuario = usuario;
+            this.mensajeError = mensajeError;
+            this.esErrorConexion = esErrorConexion;
+        }
+    }
+
+    // Iniciar sesión con validación de credenciales y cierre seguro de conexión
+    public ResultadoLogin iniciarSesionEx(String correo, String password) {
+        Connection con = conexionHelper.conectar();
+        if (con == null) {
+            return new ResultadoLogin(null, "No se pudo conectar con el servidor SQL Server. Verifique su red.", true);
+        }
+
+        String query = "SELECT id, nombre_completo, correo, password_hash, telefono, avatar_url, notificaciones_activas " +
+                       "FROM Usuario WHERE correo = ? AND password_hash = ?";
+
+        try (Connection autoCloseCon = con;
+             PreparedStatement ps = autoCloseCon.prepareStatement(query)) {
+
+            ps.setString(1, correo);
+            ps.setString(2, password);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Usuario usuario = new Usuario();
+                    usuario.setId(rs.getString("id"));
+                    usuario.setNombreCompleto(rs.getString("nombre_completo"));
+                    usuario.setCorreo(rs.getString("correo"));
+                    usuario.setPasswordHash(rs.getString("password_hash"));
+                    usuario.setTelefono(rs.getString("telefono"));
+                    usuario.setAvatarUrl(rs.getString("avatar_url"));
+                    usuario.setNotificacionesActivas(rs.getBoolean("notificaciones_activas"));
+                    return new ResultadoLogin(usuario, null, false);
+                } else {
+                    return new ResultadoLogin(null, "Correo o contraseña incorrectos", false);
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_USUARIO", "Error en iniciarSesion: " + e.getMessage());
+            return new ResultadoLogin(null, "Error al consultar la base de datos: " + e.getMessage(), true);
+        }
     }
 }

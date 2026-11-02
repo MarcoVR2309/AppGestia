@@ -22,7 +22,7 @@ import com.google.android.material.button.MaterialButton;
 
 public class frm_registro extends AppCompatActivity {
 
-    private EditText txtNombre, txtEmail, txtContrasena, txtConfirmarContrasena;
+    private EditText txtNombre, txtEmail, txtTelefono, txtContrasena, txtConfirmarContrasena;
     private Spinner spTipoUsuario;
     private CheckBox cbTerminos;
     private MaterialButton btnCrearCuenta;
@@ -43,6 +43,7 @@ public class frm_registro extends AppCompatActivity {
         // Enlace de vistas
         txtNombre = findViewById(R.id.txtNombre);
         txtEmail = findViewById(R.id.txtEmail);
+        txtTelefono = findViewById(R.id.txtTelefono);
         txtContrasena = findViewById(R.id.txtContrasena);
         txtConfirmarContrasena = findViewById(R.id.txtConfirmarContrasena);
         spTipoUsuario = findViewById(R.id.spTipoUsuario);
@@ -61,11 +62,12 @@ public class frm_registro extends AppCompatActivity {
     public void registrarUsuario(View view) {
         String nombre = txtNombre.getText() != null ? txtNombre.getText().toString().trim() : "";
         String email = txtEmail.getText() != null ? txtEmail.getText().toString().trim() : "";
+        String telefono = txtTelefono.getText() != null ? txtTelefono.getText().toString().trim() : "";
         String pass = txtContrasena.getText() != null ? txtContrasena.getText().toString().trim() : "";
         String confirmPass = txtConfirmarContrasena.getText() != null ? txtConfirmarContrasena.getText().toString().trim() : "";
 
         // 1. Validación de campos vacíos
-        if (nombre.isEmpty() || email.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
+        if (nombre.isEmpty() || email.isEmpty() || telefono.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
             Toast.makeText(this, "Por favor complete todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -109,7 +111,7 @@ public class frm_registro extends AppCompatActivity {
             }
 
             // Crear objeto de modelo e insertar
-            Usuario nuevoUsuario = new Usuario(nombre, email, pass, "");
+            Usuario nuevoUsuario = new Usuario(nombre, email, pass, telefono);
             boolean exito = usuarioControlador.registrar(nuevoUsuario);
 
             runOnUiThread(() -> {

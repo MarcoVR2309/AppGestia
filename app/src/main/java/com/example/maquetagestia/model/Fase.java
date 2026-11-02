@@ -28,23 +28,53 @@ public class Fase {
         this.estado = estado;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getProyectoId() { return proyectoId; }
-    public void setProyectoId(String proyectoId) { this.proyectoId = proyectoId; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getProyectoId() {
+        return proyectoId;
+    }
 
-    public int getOrden() { return orden; }
-    public void setOrden(int orden) { this.orden = orden; }
+    public void setProyectoId(String proyectoId) {
+        this.proyectoId = proyectoId;
+    }
 
-    public String getFechaEstimada() { return fechaEstimada; }
-    public void setFechaEstimada(String fechaEstimada) { this.fechaEstimada = fechaEstimada; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public int getOrden() {
+        return orden;
+    }
+
+    public void setOrden(int orden) {
+        this.orden = orden;
+    }
+
+    public String getFechaEstimada() {
+        return fechaEstimada;
+    }
+
+    public void setFechaEstimada(String fechaEstimada) {
+        this.fechaEstimada = fechaEstimada;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
 
     @Override
     public String toString() {

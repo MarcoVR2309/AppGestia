@@ -43,35 +43,85 @@ public class Tarea {
         this.createdAt = createdAt;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getProyectoId() { return proyectoId; }
-    public void setProyectoId(String proyectoId) { this.proyectoId = proyectoId; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getFaseId() { return faseId; }
-    public void setFaseId(String faseId) { this.faseId = faseId; }
+    public String getProyectoId() {
+        return proyectoId;
+    }
 
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setProyectoId(String proyectoId) {
+        this.proyectoId = proyectoId;
+    }
 
-    public String getInstrucciones() { return instrucciones; }
-    public void setInstrucciones(String instrucciones) { this.instrucciones = instrucciones; }
+    public String getFaseId() {
+        return faseId;
+    }
 
-    public String getPrioridad() { return prioridad; }
-    public void setPrioridad(String prioridad) { this.prioridad = prioridad; }
+    public void setFaseId(String faseId) {
+        this.faseId = faseId;
+    }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public String getTitulo() {
+        return titulo;
+    }
 
-    public String getFechaLimite() { return fechaLimite; }
-    public void setFechaLimite(String fechaLimite) { this.fechaLimite = fechaLimite; }
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 
-    public String getFechaCulminacion() { return fechaCulminacion; }
-    public void setFechaCulminacion(String fechaCulminacion) { this.fechaCulminacion = fechaCulminacion; }
+    public String getInstrucciones() {
+        return instrucciones;
+    }
 
-    public String getCreatedAt() { return createdAt; }
-    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+    public void setInstrucciones(String instrucciones) {
+        this.instrucciones = instrucciones;
+    }
+
+    public String getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(String prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getFechaLimite() {
+        return fechaLimite;
+    }
+
+    public void setFechaLimite(String fechaLimite) {
+        this.fechaLimite = fechaLimite;
+    }
+
+    public String getFechaCulminacion() {
+        return fechaCulminacion;
+    }
+
+    public void setFechaCulminacion(String fechaCulminacion) {
+        this.fechaCulminacion = fechaCulminacion;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     @Override
     public String toString() {
