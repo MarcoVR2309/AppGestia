@@ -205,6 +205,15 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <!-- RecyclerView Stepper Vertical de Fases -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvFasesStepper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_fase_stepper" />
+
             <!-- Fase 1 -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"

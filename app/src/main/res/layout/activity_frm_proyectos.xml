@@ -148,6 +148,15 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <!-- RecyclerView Dinámico de Proyectos -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvProyectos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_proyecto" />
+
             <!-- PROYECTO 1: Académico (Al hacer clic abre el Detalle) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
