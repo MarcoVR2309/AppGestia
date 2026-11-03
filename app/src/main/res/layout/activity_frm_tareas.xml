@@ -141,16 +141,24 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
-            <!-- GRUPO: HOY -->
+            <!-- LISTA DINÁMICA DE TAREAS -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="8dp"
-                android:text="Hoy (2)"
+                android:text="Lista de Tareas"
                 android:textColor="@color/on_surface"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvTareas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_tarea" />
 
             <!-- Tarea 1 -->
             <com.google.android.material.card.MaterialCardView

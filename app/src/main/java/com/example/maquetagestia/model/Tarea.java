@@ -4,6 +4,7 @@ public class Tarea {
     private String id;
     private String proyectoId;
     private String faseId; // Opcional (puede ser null)
+    private String asignadoA; // Usuario asignado (opcional)
     private String titulo;
     private String instrucciones;
     private String prioridad; // 'Baja', 'Media', 'Alta', 'Urgente'
@@ -65,6 +66,14 @@ public class Tarea {
 
     public void setFaseId(String faseId) {
         this.faseId = faseId;
+    }
+
+    public String getAsignadoA() {
+        return asignadoA;
+    }
+
+    public void setAsignadoA(String asignadoA) {
+        this.asignadoA = asignadoA;
     }
 
     public String getTitulo() {

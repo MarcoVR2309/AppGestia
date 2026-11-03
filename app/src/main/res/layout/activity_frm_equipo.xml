@@ -87,6 +87,15 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <!-- RecyclerView Dinámico de Equipo -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvEquipo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_equipo" />
+
             <!-- Miembro 1 (Líder) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"

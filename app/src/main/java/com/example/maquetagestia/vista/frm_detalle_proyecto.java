@@ -75,11 +75,13 @@ public class frm_detalle_proyecto extends AppCompatActivity {
 
     public void crearNuevaTarea(View view) {
         Intent intent = new Intent(this, frm_tareas.class);
+        intent.putExtra("PROYECTO_ID", proyectoId);
         startActivity(intent);
     }
 
     public void abrirPantallaEquipo(View view) {
         Intent intent = new Intent(this, frm_equipo.class);
+        intent.putExtra("PROYECTO_ID", proyectoId);
         startActivity(intent);
     }
 }
