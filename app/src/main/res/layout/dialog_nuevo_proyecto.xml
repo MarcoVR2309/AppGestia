@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Nombre del Proyecto -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nombre del proyecto *"
+        android:textColor="@color/on_surface"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/txtNombreProyectoDialog"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="@color/surface_container_lowest"
+        android:hint="Ej. Sistema de Inventario"
+        android:inputType="textCapSentences"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textColor="@color/on_surface"
+        android:textSize="14sp" />
+
+    <!-- Descripción -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Descripción del proyecto"
+        android:textColor="@color/on_surface"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/txtDescripcionProyectoDialog"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="@color/surface_container_lowest"
+        android:hint="Detalles y objetivos del proyecto..."
+        android:inputType="textMultiLine"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textColor="@color/on_surface"
+        android:textSize="14sp" />
+
+    <!-- Tipo de Proyecto (Spinner) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Tipo de proyecto"
+        android:textColor="@color/on_surface"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spTipoProyectoDialog"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="@color/outline" />
+
+    <!-- Fechas Inicio y Fin -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha Inicio (YYYY-MM-DD)"
+                android:textColor="@color/on_surface"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/txtFechaInicioDialog"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:backgroundTint="@color/surface_container_lowest"
+                android:hint="2026-01-01"
+                android:inputType="date"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textColor="@color/on_surface"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha Fin (YYYY-MM-DD)"
+                android:textColor="@color/on_surface"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/txtFechaFinDialog"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:backgroundTint="@color/surface_container_lowest"
+                android:hint="2026-12-31"
+                android:inputType="date"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textColor="@color/on_surface"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

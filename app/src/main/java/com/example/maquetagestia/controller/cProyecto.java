@@ -77,9 +77,9 @@ public class cProyecto {
                 psPry.executeUpdate();
             }
 
-            // 2. Insertar asignación del líder en ProyectoUsuario con ID prefijo PU000001
-            String idPu = generarIdSeguro(con, "ProyectoUsuario", "id", "PU", 6);
-            String sqlPu = "INSERT INTO ProyectoUsuario (id, proyecto_id, usuario_id, rol) VALUES (?, ?, ?, ?)";
+            // 2. Insertar asignación del líder en Proyecto_Usuario con ID prefijo PU000001
+            String idPu = generarIdSeguro(con, "Proyecto_Usuario", "id", "PU", 6);
+            String sqlPu = "INSERT INTO Proyecto_Usuario (id, proyecto_id, usuario_id, rol) VALUES (?, ?, ?, ?)";
             try (PreparedStatement psPu = con.prepareStatement(sqlPu)) {
                 psPu.setString(1, idPu);
                 psPu.setString(2, p.getId());
@@ -128,7 +128,7 @@ public class cProyecto {
 
         String sql = "SELECT p.id, p.nombre, p.descripcion, p.tipo, p.estado, p.fecha_inicio, p.fecha_fin_estimada, p.creado_por " +
                      "FROM Proyecto p " +
-                     "INNER JOIN ProyectoUsuario pu ON p.id = pu.proyecto_id " +
+                     "INNER JOIN Proyecto_Usuario pu ON p.id = pu.proyecto_id " +
                      "WHERE pu.usuario_id = ?";
 
         if (filtroTipo != null && !filtroTipo.isEmpty() && !filtroTipo.equalsIgnoreCase("Todos")) {

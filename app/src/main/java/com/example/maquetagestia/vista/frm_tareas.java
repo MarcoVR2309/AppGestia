@@ -131,10 +131,10 @@ public class frm_tareas extends AppCompatActivity {
             nuevaTarea.setInstrucciones(instrucciones);
             nuevaTarea.setPrioridad(prioridadSel);
             nuevaTarea.setEstado("Pendiente");
-            nuevaTarea.setFechaLimite("Próximamente");
+            nuevaTarea.setFechaLimite(null); // Evita error de conversíon datetime2 en SQL Server
 
             new Thread(() -> {
-                boolean exito = tareaControlador.crearTarea(nuevaTarea);
+                boolean exito = tareaControlador.crearTarea(nuevaTarea, null);
                 runOnUiThread(() -> {
                     if (exito) {
                         Toast.makeText(frm_tareas.this, "¡Tarea creada exitosamente!", Toast.LENGTH_SHORT).show();

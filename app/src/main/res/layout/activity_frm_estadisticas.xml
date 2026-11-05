@@ -118,9 +118,10 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/lblPorcentajeDonut"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="72%"
+                                android:text="0%"
                                 android:textColor="@color/primary"
                                 android:textSize="28sp"
                                 android:textStyle="bold" />
@@ -150,9 +151,10 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/lblCompletadasCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="18"
+                                android:text="0"
                                 android:textColor="@color/success_green"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -174,9 +176,10 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/lblPendientesCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="7"
+                                android:text="0"
                                 android:textColor="@color/warning_amber"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -198,9 +201,10 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/lblVencidasCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="2"
+                                android:text="0"
                                 android:textColor="@color/error"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />

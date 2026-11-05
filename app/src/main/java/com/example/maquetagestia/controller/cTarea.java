@@ -50,8 +50,28 @@ public class cTarea {
         return nuevoCodigo;
     }
 
-    // Inserción de nueva tarea con try-with-resources
-    public boolean crearTarea(Tarea t) {
+    // Auxiliar para verificar formato de fecha válido (yyyy-MM-dd o yyyy-MM-dd HH:mm:ss)
+    private boolean esFechaValida(String fecha) {
+        if (fecha == null || fecha.trim().isEmpty()) return false;
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            sdf.setLenient(false);
+            sdf.parse(fecha);
+            return true;
+        } catch (Exception e1) {
+            try {
+                java.text.SimpleDateFormat sdf2 = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+                sdf2.setLenient(false);
+                sdf2.parse(fecha);
+                return true;
+            } catch (Exception e2) {
+                return false;
+            }
+        }
+    }
+
+    // Inserción de nueva tarea con validación de fecha y asignación en Tarea_Responsable (Prefijo RES000001)
+    public boolean crearTarea(Tarea t, String usuarioIdAsignado) {
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
@@ -59,19 +79,42 @@ public class cTarea {
             String idTar = generarIdSeguro(autoCloseCon, "Tarea", "id", "TAR", 6);
             t.setId(idTar);
 
-            String sql = "INSERT INTO Tarea (id, fase_id, asignado_a, titulo, instrucciones, prioridad, estado, fecha_limite) " +
+            String sql = "INSERT INTO Tarea (id, proyecto_id, fase_id, titulo, instrucciones, prioridad, estado, fecha_limite) " +
                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
                 ps.setString(1, t.getId());
-                ps.setString(2, t.getFaseId());
-                ps.setString(3, t.getAsignadoA() != null && !t.getAsignadoA().isEmpty() ? t.getAsignadoA() : null);
+                ps.setString(2, t.getProyectoId());
+
+                if (t.getFaseId() != null && !t.getFaseId().trim().isEmpty()) {
+                    ps.setString(3, t.getFaseId());
+                } else {
+                    ps.setNull(3, java.sql.Types.VARCHAR);
+                }
+
                 ps.setString(4, t.getTitulo());
                 ps.setString(5, t.getInstrucciones());
                 ps.setString(6, t.getPrioridad() != null ? t.getPrioridad() : "Media");
                 ps.setString(7, t.getEstado() != null ? t.getEstado() : "Pendiente");
-                ps.setString(8, t.getFechaLimite());
 
-                return ps.executeUpdate() > 0;
+                // Validación estricta de fecha_limite para datetime2(7)
+                if (t.getFechaLimite() != null && esFechaValida(t.getFechaLimite())) {
+                    ps.setString(8, t.getFechaLimite());
+                } else {
+                    ps.setNull(8, java.sql.Types.TIMESTAMP);
+                }
+
+                boolean insertado = ps.executeUpdate() > 0;
+
+                // Si se proporcionó un usuario asignado, registrar en Tarea_Responsable con prefijo RES000001
+                String responsableId = (usuarioIdAsignado != null && !usuarioIdAsignado.trim().isEmpty())
+                        ? usuarioIdAsignado
+                        : t.getAsignadoA();
+
+                if (insertado && responsableId != null && !responsableId.trim().isEmpty()) {
+                    asignarResponsableTarea(autoCloseCon, t.getId(), responsableId);
+                }
+
+                return insertado;
             }
         } catch (Exception e) {
             Log.e("CRUD_TAREA", "Error al crear tarea: " + e.getMessage());
@@ -79,15 +122,47 @@ public class cTarea {
         }
     }
 
-    // Listar tareas pertenecientes a un proyecto uniendo con la tabla Fase
+    public boolean crearTarea(Tarea t) {
+        return crearTarea(t, t.getAsignadoA());
+    }
+
+    // Asignar responsable a una tarea en Tarea_Responsable (Prefijo RES000001)
+    public boolean asignarResponsableTarea(Connection con, String idTarea, String idUsuario) {
+        if (con == null || idTarea == null || idUsuario == null || idUsuario.trim().isEmpty()) return false;
+        try {
+            String idRes = generarIdSeguro(con, "Tarea_Responsable", "id", "RES", 6);
+            String sql = "INSERT INTO Tarea_Responsable (id, tarea_id, usuario_id) VALUES (?, ?, ?)";
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, idRes);
+                ps.setString(2, idTarea);
+                ps.setString(3, idUsuario);
+                return ps.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_TAREA", "Error al asignar responsable de tarea en Tarea_Responsable: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean asignarResponsableTarea(String idTarea, String idUsuario) {
+        Connection con = conexionHelper.conectar();
+        if (con == null) return false;
+        try (Connection autoCloseCon = con) {
+            return asignarResponsableTarea(autoCloseCon, idTarea, idUsuario);
+        } catch (Exception e) {
+            Log.e("CRUD_TAREA", "Error en asignarResponsableTarea: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Listar tareas pertenecientes a un proyecto consultando directamente por Tarea.proyecto_id
     public List<Tarea> listarTareasPorProyecto(String idProyecto) {
         List<Tarea> lista = new ArrayList<>();
         Connection con = conexionHelper.conectar();
         if (con == null) return lista;
 
-        String sql = "SELECT t.id, t.fase_id, t.asignado_a, t.titulo, t.instrucciones, t.prioridad, t.estado, t.fecha_limite " +
-                     "FROM Tarea t INNER JOIN Fase f ON t.fase_id = f.id " +
-                     "WHERE f.proyecto_id = ? ORDER BY t.created_at DESC";
+        String sql = "SELECT id, proyecto_id, fase_id, titulo, instrucciones, prioridad, estado, fecha_limite " +
+                     "FROM Tarea WHERE proyecto_id = ? ORDER BY created_at DESC";
 
         try (Connection autoCloseCon = con;
              PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
@@ -97,8 +172,8 @@ public class cTarea {
                 while (rs.next()) {
                     Tarea t = new Tarea();
                     t.setId(rs.getString("id"));
+                    t.setProyectoId(rs.getString("proyecto_id"));
                     t.setFaseId(rs.getString("fase_id"));
-                    t.setAsignadoA(rs.getString("asignado_a"));
                     t.setTitulo(rs.getString("titulo"));
                     t.setInstrucciones(rs.getString("instrucciones"));
                     t.setPrioridad(rs.getString("prioridad"));

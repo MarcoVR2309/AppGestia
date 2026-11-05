@@ -33,7 +33,7 @@ public class cEquipo {
         if (con == null) return lista;
 
         String sql = "SELECT u.id, u.nombre_completo, u.correo, u.telefono, u.avatar_url, pu.rol " +
-                     "FROM Usuario u INNER JOIN ProyectoUsuario pu ON u.id = pu.usuario_id " +
+                     "FROM Usuario u INNER JOIN Proyecto_Usuario pu ON u.id = pu.usuario_id " +
                      "WHERE pu.proyecto_id = ?";
 
         try (Connection autoCloseCon = con;
@@ -80,10 +80,10 @@ public class cEquipo {
 
             // 2. Generar ID con prefijo PU000001
             cProyecto controllerPry = new cProyecto();
-            String idPu = controllerPry.generarIdSeguro(autoCloseCon, "ProyectoUsuario", "id", "PU", 6);
+            String idPu = controllerPry.generarIdSeguro(autoCloseCon, "Proyecto_Usuario", "id", "PU", 6);
 
-            // 3. Insertar en ProyectoUsuario
-            String sqlInsert = "INSERT INTO ProyectoUsuario (id, proyecto_id, usuario_id, rol) VALUES (?, ?, ?, ?)";
+            // 3. Insertar en Proyecto_Usuario
+            String sqlInsert = "INSERT INTO Proyecto_Usuario (id, proyecto_id, usuario_id, rol) VALUES (?, ?, ?, ?)";
             try (PreparedStatement psI = autoCloseCon.prepareStatement(sqlInsert)) {
                 psI.setString(1, idPu);
                 psI.setString(2, idProyecto);
