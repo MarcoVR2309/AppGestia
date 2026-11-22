@@ -10,6 +10,7 @@ public class Proyecto {
     private String fechaFinEstimada;
     private String creadoPor;
     private String createdAt;
+    private int progresoPorcentaje;
 
     public Proyecto() {
     }
@@ -106,6 +107,14 @@ public class Proyecto {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getProgresoPorcentaje() {
+        return progresoPorcentaje;
+    }
+
+    public void setProgresoPorcentaje(int progresoPorcentaje) {
+        this.progresoPorcentaje = progresoPorcentaje;
     }
 
     @Override

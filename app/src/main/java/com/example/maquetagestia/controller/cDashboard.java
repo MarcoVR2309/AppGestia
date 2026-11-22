@@ -78,24 +78,42 @@ public class cDashboard {
         public int porcentajeCumplimiento = 0;
     }
 
-    // Consultar analíticas detalladas para frm_estadisticas.java
+    // Consultar analíticas detalladas para frm_estadisticas.java (histórico completo)
     public EstadisticasDTO obtenerEstadisticasDetalladas(String idUsuario) {
+        return obtenerEstadisticasDetalladas(idUsuario, "Todo");
+    }
+
+    // Consultar analíticas detalladas filtradas por periodo usando Tarea.created_at
+    public EstadisticasDTO obtenerEstadisticasDetalladas(String idUsuario, String periodo) {
         EstadisticasDTO dto = new EstadisticasDTO();
         if (idUsuario == null || idUsuario.isEmpty()) return dto;
 
         Connection con = conexionHelper.conectar();
         if (con == null) return dto;
 
-        String sql = "SELECT COUNT(*) AS total, " +
-                     "SUM(CASE WHEN t.estado = 'Finalizada' THEN 1 ELSE 0 END) AS completadas, " +
-                     "SUM(CASE WHEN t.estado IN ('Pendiente', 'EnProgreso') THEN 1 ELSE 0 END) AS pendientes, " +
-                     "SUM(CASE WHEN t.estado != 'Finalizada' AND t.fecha_limite IS NOT NULL AND t.fecha_limite < SYSUTCDATETIME() THEN 1 ELSE 0 END) AS vencidas " +
-                     "FROM Tarea t " +
-                     "INNER JOIN Tarea_Responsable tr ON t.id = tr.tarea_id " +
-                     "WHERE tr.usuario_id = ?";
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) AS total, " +
+                "ISNULL(SUM(CASE WHEN t.estado = 'Finalizada' THEN 1 ELSE 0 END), 0) AS completadas, " +
+                "ISNULL(SUM(CASE WHEN t.estado IN ('Pendiente', 'EnProgreso') THEN 1 ELSE 0 END), 0) AS pendientes, " +
+                "ISNULL(SUM(CASE WHEN t.estado != 'Finalizada' AND t.fecha_limite IS NOT NULL AND t.fecha_limite < SYSUTCDATETIME() THEN 1 ELSE 0 END), 0) AS vencidas " +
+                "FROM Tarea t " +
+                "INNER JOIN Tarea_Responsable tr ON t.id = tr.tarea_id " +
+                "WHERE tr.usuario_id = ?"
+        );
+
+        if ("Este mes".equalsIgnoreCase(periodo)) {
+            sql.append(" AND YEAR(t.created_at) = YEAR(SYSUTCDATETIME()) AND MONTH(t.created_at) = MONTH(SYSUTCDATETIME())");
+        } else if ("Mes anterior".equalsIgnoreCase(periodo)) {
+            sql.append(" AND t.created_at >= DATEADD(MONTH, DATEDIFF(MONTH, 0, SYSUTCDATETIME()) - 1, 0)");
+            sql.append(" AND t.created_at < DATEADD(MONTH, DATEDIFF(MONTH, 0, SYSUTCDATETIME()), 0)");
+        } else if ("Últimos 3 meses".equalsIgnoreCase(periodo)) {
+            sql.append(" AND t.created_at >= DATEADD(MONTH, -3, SYSUTCDATETIME())");
+        } else if ("Este año".equalsIgnoreCase(periodo)) {
+            sql.append(" AND YEAR(t.created_at) = YEAR(SYSUTCDATETIME())");
+        }
 
         try (Connection autoCloseCon = con;
-             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+             PreparedStatement ps = autoCloseCon.prepareStatement(sql.toString())) {
 
             ps.setString(1, idUsuario);
             try (ResultSet rs = ps.executeQuery()) {

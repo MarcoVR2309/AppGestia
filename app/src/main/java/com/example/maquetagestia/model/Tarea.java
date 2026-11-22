@@ -12,6 +12,8 @@ public class Tarea {
     private String fechaLimite;
     private String fechaCulminacion;
     private String createdAt;
+    private String responsableId;
+    private String responsableNombre;
 
     public Tarea() {
     }
@@ -130,6 +132,22 @@ public class Tarea {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getResponsableId() {
+        return responsableId;
+    }
+
+    public void setResponsableId(String responsableId) {
+        this.responsableId = responsableId;
+    }
+
+    public String getResponsableNombre() {
+        return responsableNombre;
+    }
+
+    public void setResponsableNombre(String responsableNombre) {
+        this.responsableNombre = responsableNombre;
     }
 
     @Override

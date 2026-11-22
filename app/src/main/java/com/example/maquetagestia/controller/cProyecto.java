@@ -51,8 +51,8 @@ public class cProyecto {
         return nuevoCodigo;
     }
 
-    // Transacción Atómica Completa: Crear Proyecto (PRY), Asignar Líder en ProyectoUsuario (PU) y Crear 3 Fases (FAS)
-    public boolean crearProyectoConFases(Proyecto p, String usuarioIdLider) {
+    // Transacción Atómica: Crear Proyecto (PRY) y Asignar Líder en Proyecto_Usuario (PU)
+    public boolean crearProyecto(Proyecto p, String usuarioIdLider) {
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
@@ -88,26 +88,14 @@ public class cProyecto {
                 psPu.executeUpdate();
             }
 
-            // 3. Insertar 3 Fases por defecto ("Planificación", "Desarrollo", "Cierre") con ID prefijo FAS000001
-            String[] nombresFases = {"Planificación", "Desarrollo", "Cierre"};
-            String sqlFas = "INSERT INTO Fase (id, proyecto_id, nombre, orden, estado) VALUES (?, ?, ?, ?, ?)";
-            for (int i = 0; i < nombresFases.length; i++) {
-                String idFas = generarIdSeguro(con, "Fase", "id", "FAS", 6);
-                try (PreparedStatement psFas = con.prepareStatement(sqlFas)) {
-                    psFas.setString(1, idFas);
-                    psFas.setString(2, p.getId());
-                    psFas.setString(3, nombresFases[i]);
-                    psFas.setInt(4, i + 1);
-                    psFas.setString(5, i == 0 ? "EnProgreso" : "Pendiente");
-                    psFas.executeUpdate();
-                }
-            }
-
-            con.commit(); // Confirmar la transacción atómica completa
+            con.commit(); // Confirmar la transacción atómica
             con.close();
+
+            Fase faseInicial = new Fase(idPry, "Borrador", 1, null, "EnProgreso");
+            new cFase().crearFase(faseInicial);
             return true;
         } catch (Exception e) {
-            Log.e("CRUD_PROYECTO", "Error en crearProyectoConFases: " + e.getMessage());
+            Log.e("CRUD_PROYECTO", "Error en crearProyecto: " + e.getMessage());
             try {
                 if (con != null && !con.isClosed()) {
                     con.rollback(); // Rollback en caso de error
@@ -120,13 +108,16 @@ public class cProyecto {
         }
     }
 
-    // Listar proyectos asociados a un usuario con filtro por tipo
+    // Listar proyectos asociados a un usuario con filtro por tipo y progreso real de fases
     public List<Proyecto> listarPorUsuario(String usuarioId, String filtroTipo) {
         List<Proyecto> lista = new ArrayList<>();
         Connection con = conexionHelper.conectar();
         if (con == null) return lista;
 
-        String sql = "SELECT p.id, p.nombre, p.descripcion, p.tipo, p.estado, p.fecha_inicio, p.fecha_fin_estimada, p.creado_por " +
+        String sql = "SELECT p.id, p.nombre, p.descripcion, p.tipo, p.estado, p.fecha_inicio, p.fecha_fin_estimada, p.creado_por, p.created_at, " +
+                     "ISNULL((SELECT CASE WHEN COUNT(*) = 0 THEN 0 " +
+                     "ELSE (SUM(CASE WHEN f.estado = 'Completada' THEN 1 ELSE 0 END) * 100) / COUNT(*) END " +
+                     "FROM Fase f WHERE f.proyecto_id = p.id), 0) AS progreso_porcentaje " +
                      "FROM Proyecto p " +
                      "INNER JOIN Proyecto_Usuario pu ON p.id = pu.proyecto_id " +
                      "WHERE pu.usuario_id = ?";
@@ -134,6 +125,7 @@ public class cProyecto {
         if (filtroTipo != null && !filtroTipo.isEmpty() && !filtroTipo.equalsIgnoreCase("Todos")) {
             sql += " AND p.tipo = ?";
         }
+        sql += " ORDER BY p.created_at DESC";
 
         try (Connection autoCloseCon = con;
              PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
@@ -154,6 +146,8 @@ public class cProyecto {
                     p.setFechaInicio(rs.getString("fecha_inicio"));
                     p.setFechaFinEstimada(rs.getString("fecha_fin_estimada"));
                     p.setCreadoPor(rs.getString("creado_por"));
+                    p.setCreatedAt(rs.getString("created_at"));
+                    p.setProgresoPorcentaje(rs.getInt("progreso_porcentaje"));
                     lista.add(p);
                 }
             }

@@ -83,21 +83,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Charles Dummar"
                     android:textColor="@color/on_surface"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="Nombre de Usuario" />
 
                 <TextView
                     android:id="@+id/tvEmailUsuario"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="charles.rivera@gestia.edu"
                     android:textColor="@color/on_surface_variant"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    tools:text="correo@gestia.edu" />
 
-                <!-- Estadísticas Rápidas (12 Proyectos | 48 Tareas) -->
+                <!-- Estadísticas Rápidas (Proyectos | Tareas) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -105,10 +105,12 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardPerfilProyectos"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="6dp"
                         android:layout_weight="1"
+                        android:onClick="abrirProyectosPerfil"
                         app:cardBackgroundColor="@color/surface_container_lowest"
                         app:cardCornerRadius="12dp"
                         app:strokeColor="@color/outline_variant">
@@ -117,16 +119,19 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:onClick="abrirProyectosPerfil"
                             android:orientation="vertical"
                             android:padding="12dp">
 
                             <TextView
+                                android:id="@+id/lblPerfilProyectos"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="12"
+                                android:text="0"
                                 android:textColor="@color/primary"
                                 android:textSize="18sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                tools:text="0" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -138,10 +143,12 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardPerfilTareas"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:layout_weight="1"
+                        android:onClick="abrirTareasPerfil"
                         app:cardBackgroundColor="@color/surface_container_lowest"
                         app:cardCornerRadius="12dp"
                         app:strokeColor="@color/outline_variant">
@@ -150,16 +157,19 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:onClick="abrirTareasPerfil"
                             android:orientation="vertical"
                             android:padding="12dp">
 
                             <TextView
+                                android:id="@+id/lblPerfilTareas"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="48"
+                                android:text="0"
                                 android:textColor="@color/primary"
                                 android:textSize="18sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                tools:text="0" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -185,9 +195,11 @@
 
             <!-- Editar perfil -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardEditarPerfil"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                android:onClick="editarPerfil"
                 app:cardBackgroundColor="@color/surface_container_lowest"
                 app:cardCornerRadius="12dp"
                 app:strokeColor="@color/outline_variant">

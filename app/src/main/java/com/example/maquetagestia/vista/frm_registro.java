@@ -1,12 +1,14 @@
 package com.example.maquetagestia.vista;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,6 +21,7 @@ import com.example.maquetagestia.R;
 import com.example.maquetagestia.controller.cUsuario;
 import com.example.maquetagestia.model.Usuario;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class frm_registro extends AppCompatActivity {
 
@@ -57,6 +60,25 @@ public class frm_registro extends AppCompatActivity {
         String[] opcionesUsuario = {"Selecciona un tipo", "Estudiante", "Docente", "Profesional/Empresarial"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, opcionesUsuario);
         spTipoUsuario.setAdapter(adapter);
+
+        TextView tvVerTerminos = findViewById(R.id.tvVerTerminos);
+        if (tvVerTerminos != null) {
+            tvVerTerminos.setPaintFlags(tvVerTerminos.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        }
+    }
+
+    public void mostrarTerminosCondiciones(View view) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Términos y Condiciones de Gestia")
+                .setMessage("1. Uso de la plataforma: MaquetaGestia está destinada a la gestión de proyectos académicos y empresariales, planificación de fases y seguimiento de tareas en equipo.\n\n"
+                        + "2. Privacidad y credenciales: Tus contraseñas se almacenan cifradas mediante SHA-256 en SQL Server y tu sesión local se guarda exclusivamente en tu dispositivo.\n\n"
+                        + "3. Responsabilidad: El usuario es responsable de la veracidad de los datos registrados y de la colaboración dentro de sus proyectos asignados.")
+                .setPositiveButton("Aceptar", (dialog, which) -> {
+                    if (cbTerminos != null) cbTerminos.setChecked(true);
+                    dialog.dismiss();
+                })
+                .setNegativeButton("Cerrar", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     public void registrarUsuario(View view) {
@@ -110,8 +132,12 @@ public class frm_registro extends AppCompatActivity {
                 return;
             }
 
-            // Crear objeto de modelo e insertar
+            // Crear objeto de modelo e insertar con tipoUsuario seleccionado
+            String tipoUsuarioSel = spTipoUsuario.getSelectedItem() != null
+                    ? spTipoUsuario.getSelectedItem().toString()
+                    : "Estudiante";
             Usuario nuevoUsuario = new Usuario(nombre, email, pass, telefono);
+            nuevoUsuario.setTipoUsuario(tipoUsuarioSel);
             boolean exito = usuarioControlador.registrar(nuevoUsuario);
 
             runOnUiThread(() -> {

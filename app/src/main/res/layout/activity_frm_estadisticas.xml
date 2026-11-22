@@ -9,18 +9,18 @@
     tools:context=".vista.frm_estadisticas">
 
     <!-- 1. ENCABEZADO FIJO -->
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/headerEstadisticas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:padding="16dp">
 
         <ImageButton
             android:id="@+id/btnVolverEstadisticas"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Volver"
             android:onClick="volverAlHome"
@@ -28,9 +28,13 @@
             app:tint="@color/primary" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="Estadísticas"
             android:textColor="@color/primary"
             android:textSize="20sp"
@@ -40,10 +44,8 @@
             android:id="@+id/spPeriodo"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:backgroundTint="@color/primary" />
-    </RelativeLayout>
+    </LinearLayout>
 
     <!-- 2. CONTENIDO DESPLAZABLE -->
     <ScrollView
@@ -102,12 +104,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
-                            android:progress="72"
+                            android:progress="0"
                             app:indicatorColor="@color/primary"
                             app:indicatorSize="140dp"
                             app:trackColor="@color/surface_container_high"
                             app:trackCornerRadius="8dp"
-                            app:trackThickness="16dp" />
+                            app:trackThickness="16dp"
+                            tools:progress="75" />
 
                         <!-- Texto en el centro del círculo -->
                         <LinearLayout
@@ -220,95 +223,6 @@
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <!-- TARJETA 2: MÉTRICAS RESUMEN -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <!-- Tiempo Invertido -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@color/surface_container_lowest"
-                    app:cardCornerRadius="12dp"
-                    app:strokeColor="@color/outline_variant">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tiempo Invertido"
-                            android:textColor="@color/on_surface_variant"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="48h"
-                            android:textColor="@color/on_surface"
-                            android:textSize="22sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="(Este mes)"
-                            android:textColor="@color/outline"
-                            android:textSize="10sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Productividad -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    app:cardBackgroundColor="@color/surface_container_lowest"
-                    app:cardCornerRadius="12dp"
-                    app:strokeColor="@color/outline_variant">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Productividad"
-                            android:textColor="@color/on_surface_variant"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="+25%"
-                            android:textColor="@color/success_green"
-                            android:textSize="22sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="(vs. mes anterior)"
-                            android:textColor="@color/outline"
-                            android:textSize="10sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

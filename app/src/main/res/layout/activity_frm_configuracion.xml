@@ -131,8 +131,13 @@
 
                     <!-- Idioma -->
                     <RelativeLayout
+                        android:id="@+id/rowIdioma"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:onClick="mostrarDialogoIdioma"
                         android:padding="16dp">
 
                         <TextView
@@ -180,8 +185,13 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/rowSeguridad"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:onClick="mostrarDialogoSeguridad"
                         android:padding="16dp"
                         android:text="Seguridad y privacidad"
                         android:textColor="@color/on_surface"
@@ -193,8 +203,13 @@
                         android:background="@color/outline_variant" />
 
                     <TextView
+                        android:id="@+id/rowDatosPersonales"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:onClick="abrirDatosPersonales"
                         android:padding="16dp"
                         android:text="Datos personales"
                         android:textColor="@color/on_surface"
@@ -226,8 +241,13 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/rowAcercaDe"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:onClick="mostrarAcercaDe"
                         android:padding="16dp"
                         android:text="Acerca de Gestia"
                         android:textColor="@color/on_surface"
@@ -239,8 +259,13 @@
                         android:background="@color/outline_variant" />
 
                     <TextView
+                        android:id="@+id/rowTerminosConfig"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:onClick="mostrarTerminosConfig"
                         android:padding="16dp"
                         android:text="Términos y condiciones"
                         android:textColor="@color/on_surface"

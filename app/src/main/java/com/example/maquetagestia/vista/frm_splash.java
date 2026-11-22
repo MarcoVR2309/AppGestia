@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,6 +25,11 @@ public class frm_splash extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setDefaultNightMode(
+                Sesion.isModoOscuro(this)
+                        ? AppCompatDelegate.MODE_NIGHT_YES
+                        : AppCompatDelegate.MODE_NIGHT_NO
+        );
         super.onCreate(savedInstanceState);
 
         EdgeToEdge.enable(this);

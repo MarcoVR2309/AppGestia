@@ -53,8 +53,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
                     android:layout_toStartOf="@id/lblEstadoFase"
-                    android:text="Fase 1: Planificación"
+                    android:text="1. Borrador"
                     android:textColor="@color/on_surface"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -63,7 +64,9 @@
                     android:id="@+id/lblEstadoFase"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@id/btnEditarFase"
                     android:background="@color/success_green_container"
                     android:paddingStart="8dp"
                     android:paddingTop="2dp"
@@ -73,6 +76,19 @@
                     android:textColor="@color/success_green"
                     android:textSize="10sp"
                     android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/btnEditarFase"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Editar fase"
+                    android:padding="4dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_edit"
+                    app:tint="@color/primary" />
             </RelativeLayout>
 
             <TextView

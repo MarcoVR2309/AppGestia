@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardNotificacion"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/surface_container_lowest"
+    app:cardCornerRadius="12dp"
+    app:strokeColor="@color/outline_variant">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imgIconoNotif"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="Icono de notificación"
+                android:src="@drawable/ic_notifications"
+                app:tint="@color/primary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_toStartOf="@id/indicadorNoLeida"
+                android:layout_toEndOf="@id/imgIconoNotif"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/lblTituloNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Título de notificación"
+                    android:textColor="@color/on_surface"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblMensajeNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Mensaje de la notificación"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/lblFechaNotif"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Fecha"
+                    android:textColor="@color/outline"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <!-- Punto indicador de NO LEÍDA -->
+            <View
+                android:id="@+id/indicadorNoLeida"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/ic_launcher_background"
+                android:backgroundTint="@color/error" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRechazarInvitacion"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginTop="10dp"
+                android:text="Rechazar"
+                android:textAllCaps="false"
+                android:textColor="@color/error"
+                android:textSize="12sp"
+                android:visibility="gone"
+                app:cornerRadius="18dp"
+                app:strokeColor="@color/error" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAceptarInvitacion"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/primary_container"
+                android:text="Aceptar"
+                android:textAllCaps="false"
+                android:textColor="@color/on_primary"
+                android:textSize="12sp"
+                android:visibility="gone"
+                app:cornerRadius="18dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

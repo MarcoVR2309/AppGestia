@@ -1,5 +1,6 @@
 package com.example.maquetagestia.vista;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -74,6 +75,12 @@ public class frm_equipo extends AppCompatActivity {
         finish();
     }
 
+    public void abrirPantallaTareas(View view) {
+        Intent intent = new Intent(this, frm_tareas.class);
+        intent.putExtra("PROYECTO_ID", proyectoId);
+        startActivity(intent);
+    }
+
     public void asignarMiembros(View view) {
         if (proyectoId == null || proyectoId.isEmpty()) return;
 
@@ -84,7 +91,7 @@ public class frm_equipo extends AppCompatActivity {
         EditText txtEmail = dialogView.findViewById(R.id.txtEmailInvitarDialog);
         Spinner spRol = dialogView.findViewById(R.id.spRolInvitarDialog);
 
-        String[] roles = {"Colaborador", "Líder", "Observador"};
+        String[] roles = {"Colaborador", "Lider", "Observador"};
         ArrayAdapter<String> adapterRol = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, roles);
         spRol.setAdapter(adapterRol);
 
@@ -102,7 +109,7 @@ public class frm_equipo extends AppCompatActivity {
                 boolean exito = equipoControlador.agregarMiembroEquipo(proyectoId, correo, rolSel);
                 runOnUiThread(() -> {
                     if (exito) {
-                        Toast.makeText(frm_equipo.this, "¡Miembro agregado al equipo!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(frm_equipo.this, "¡Invitación enviada al usuario!", Toast.LENGTH_SHORT).show();
                         cargarEquipo();
                     } else {
                         Toast.makeText(frm_equipo.this, "El correo no existe o ya pertenece al proyecto", Toast.LENGTH_LONG).show();

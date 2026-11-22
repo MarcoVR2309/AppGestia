@@ -2,6 +2,7 @@ package com.example.maquetagestia.vista;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,21 +47,31 @@ public class frm_estadisticas extends AppCompatActivity {
 
         dashboardControlador = new cDashboard();
 
-        String[] opcionesPeriodo = {"Este mes", "Mes anterior", "Últimos 3 meses", "Este año"};
+        String[] opcionesPeriodo = {"Este mes", "Mes anterior", "Últimos 3 meses", "Este año", "Todo"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, opcionesPeriodo);
         if (spPeriodo != null) {
             spPeriodo.setAdapter(adapter);
-        }
+            spPeriodo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    cargarEstadisticas(opcionesPeriodo[position]);
+                }
 
-        cargarEstadisticas();
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+        } else {
+            cargarEstadisticas("Este mes");
+        }
     }
 
-    private void cargarEstadisticas() {
+    private void cargarEstadisticas(String periodo) {
         String idUsuario = Sesion.getIdUsuario(this);
         if (idUsuario == null) return;
 
         new Thread(() -> {
-            EstadisticasDTO dto = dashboardControlador.obtenerEstadisticasDetalladas(idUsuario);
+            EstadisticasDTO dto = dashboardControlador.obtenerEstadisticasDetalladas(idUsuario, periodo);
 
             runOnUiThread(() -> {
                 if (chartDonut != null) chartDonut.setProgress(dto.porcentajeCumplimiento);

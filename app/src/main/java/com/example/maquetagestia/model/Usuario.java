@@ -7,6 +7,7 @@ public class Usuario {
     private String passwordHash;
     private String avatarUrl;
     private String telefono;
+    private String tipoUsuario;
     private boolean notificacionesActivas;
     private String createdAt;
     private String updatedAt;
@@ -84,6 +85,14 @@ public class Usuario {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public String getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(String tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
     }
 
     public boolean isNotificacionesActivas() {

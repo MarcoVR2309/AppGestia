@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Nombre de la Fase -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nombre de la fase *"
+        android:textColor="@color/on_surface"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/txtNombreFaseDialog"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="@color/surface_container_lowest"
+        android:hint="Ej. Diseño de Arquitectura"
+        android:inputType="textCapSentences"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textColor="@color/on_surface"
+        android:textSize="14sp" />
+
+    <!-- Fecha Estimada -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Fecha estimada (YYYY-MM-DD)"
+        android:textColor="@color/on_surface"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/txtFechaEstimadaFaseDialog"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="@color/surface_container_lowest"
+        android:clickable="true"
+        android:cursorVisible="false"
+        android:drawableEnd="@drawable/ic_calendar_today"
+        android:drawablePadding="8dp"
+        android:focusable="false"
+        android:hint="2026-12-31"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textColor="@color/on_surface"
+        android:textSize="14sp" />
+
+    <!-- Estado de la Fase (visible solo al editar) -->
+    <TextView
+        android:id="@+id/lblEstadoFaseDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Estado de la fase"
+        android:textColor="@color/on_surface"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <Spinner
+        android:id="@+id/spEstadoFaseDialog"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="@color/outline"
+        android:visibility="gone" />
+
+</LinearLayout>

@@ -48,11 +48,12 @@ public class ProyectoAdapter extends RecyclerView.Adapter<ProyectoAdapter.Proyec
                         (p.getFechaFinEstimada() != null ? p.getFechaFinEstimada() : "Fin");
         holder.lblFechas.setText(fechas);
 
-        // Avance según estado por defecto
-        int progreso = 30;
-        if ("Finalizado".equalsIgnoreCase(p.getEstado())) progreso = 100;
-        else if ("EnProgreso".equalsIgnoreCase(p.getEstado())) progreso = 60;
+        // Avance real según fases completadas del proyecto
+        int progreso = Math.max(0, Math.min(100, p.getProgresoPorcentaje()));
         holder.progressAvance.setProgress(progreso);
+        if (holder.lblPorcentaje != null) {
+            holder.lblPorcentaje.setText(progreso + "%");
+        }
 
         // Clic para abrir Detalle de Proyecto pasando su ID
         holder.cardProyecto.setOnClickListener(v -> {
@@ -69,7 +70,7 @@ public class ProyectoAdapter extends RecyclerView.Adapter<ProyectoAdapter.Proyec
 
     public static class ProyectoViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView cardProyecto;
-        TextView lblTipo, lblNombre, lblDescripcion, lblEstado, lblFechas;
+        TextView lblTipo, lblNombre, lblDescripcion, lblEstado, lblFechas, lblPorcentaje;
         ProgressBar progressAvance;
 
         public ProyectoViewHolder(@NonNull View itemView) {
@@ -80,6 +81,7 @@ public class ProyectoAdapter extends RecyclerView.Adapter<ProyectoAdapter.Proyec
             lblDescripcion = itemView.findViewById(R.id.lblDescripcionProyecto);
             lblEstado = itemView.findViewById(R.id.lblEstadoProyecto);
             lblFechas = itemView.findViewById(R.id.lblFechasProyecto);
+            lblPorcentaje = itemView.findViewById(R.id.lblPorcentajeProyecto);
             progressAvance = itemView.findViewById(R.id.progressAvance);
         }
     }

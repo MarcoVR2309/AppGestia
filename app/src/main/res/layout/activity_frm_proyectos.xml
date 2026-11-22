@@ -104,6 +104,7 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChipTodos"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:backgroundTint="@color/primary_container"
@@ -114,6 +115,7 @@
                         app:cornerRadius="18dp" />
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChipActivos"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
@@ -126,6 +128,7 @@
                         app:strokeColor="@color/outline_variant" />
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChipAcademicos"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
@@ -138,6 +141,7 @@
                         app:strokeColor="@color/outline_variant" />
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChipEmpresariales"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
@@ -171,155 +175,16 @@
                 tools:itemCount="2"
                 tools:listitem="@layout/item_proyecto" />
 
-            <!-- PROYECTO 1: Académico (Al hacer clic abre el Detalle) -->
-            <com.google.android.material.card.MaterialCardView
+            <TextView
+                android:id="@+id/tvSinProyectos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:onClick="abrirDetalleProyecto"
-                app:cardBackgroundColor="@color/surface_container_lowest"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/outline_variant">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="abrirDetalleProyecto"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/secondary_container"
-                        android:paddingStart="8dp"
-                        android:paddingTop="2dp"
-                        android:paddingEnd="8dp"
-                        android:paddingBottom="2dp"
-                        android:text="ACADÉMICO"
-                        android:textColor="@color/secondary"
-                        android:textSize="10sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Análisis de Mercado FinTech"
-                        android:textColor="@color/on_surface"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Estudio exhaustivo sobre la adopción de billeteras digitales en Latinoamérica."
-                        android:textColor="@color/on_surface_variant"
-                        android:textSize="12sp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Progreso"
-                            android:textColor="@color/on_surface_variant"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="65%"
-                            android:textColor="@color/primary"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <ProgressBar
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:layout_marginTop="4dp"
-                        android:max="100"
-                        android:progress="65"
-                        android:progressTint="@color/primary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="01 Sep 2026 - 30 Nov 2026"
-                        android:textColor="@color/outline"
-                        android:textSize="11sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- PROYECTO 2: Empresarial -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:onClick="abrirDetalleProyecto"
-                app:cardBackgroundColor="@color/surface_container_lowest"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/outline_variant">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="abrirDetalleProyecto"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/primary_container"
-                        android:paddingStart="8dp"
-                        android:paddingTop="2dp"
-                        android:paddingEnd="8dp"
-                        android:paddingBottom="2dp"
-                        android:text="EMPRESARIAL"
-                        android:textColor="@color/on_primary"
-                        android:textSize="10sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Implementación CRM Global"
-                        android:textColor="@color/on_surface"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Migración del sistema heredado a Salesforce para equipos de ventas."
-                        android:textColor="@color/on_surface_variant"
-                        android:textSize="12sp" />
-
-                    <ProgressBar
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:layout_marginTop="12dp"
-                        android:max="100"
-                        android:progress="32"
-                        android:progressTint="@color/primary" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_marginTop="36dp"
+                android:gravity="center"
+                android:text="No se encontraron proyectos con este filtro"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="14sp"
+                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>
