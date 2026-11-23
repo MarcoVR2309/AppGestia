@@ -33,11 +33,17 @@ public class EquipoAdapter extends RecyclerView.Adapter<EquipoAdapter.EquipoView
     private final Context context;
     private final List<MiembroEquipoItem> listaMiembros;
     private final cEquipo equipoControlador;
+    private final boolean esUsuarioLider;
 
     public EquipoAdapter(Context context, List<MiembroEquipoItem> listaMiembros) {
+        this(context, listaMiembros, false);
+    }
+
+    public EquipoAdapter(Context context, List<MiembroEquipoItem> listaMiembros, boolean esUsuarioLider) {
         this.context = context;
         this.listaMiembros = listaMiembros;
         this.equipoControlador = new cEquipo();
+        this.esUsuarioLider = esUsuarioLider;
     }
 
     @NonNull
@@ -57,7 +63,7 @@ public class EquipoAdapter extends RecyclerView.Adapter<EquipoAdapter.EquipoView
         String rol = item.rol != null ? item.rol : "Colaborador";
         holder.lblRol.setText(rol);
 
-        if ("Lider".equalsIgnoreCase(rol) || "Líder".equalsIgnoreCase(rol)) {
+        if (cEquipo.esRolLider(rol)) {
             holder.lblRol.setTextColor(ContextCompat.getColor(context, R.color.on_primary));
             holder.lblRol.setBackgroundColor(ContextCompat.getColor(context, R.color.primary_container));
         } else if ("Colaborador".equalsIgnoreCase(rol)) {
@@ -71,7 +77,7 @@ public class EquipoAdapter extends RecyclerView.Adapter<EquipoAdapter.EquipoView
         String idUsuarioSesion = Sesion.getIdUsuario(context);
         boolean esMismoUsuario = idUsuarioSesion != null && item.usuario != null
                 && idUsuarioSesion.equals(item.usuario.getId());
-        holder.btnOpcionesEquipo.setVisibility(esMismoUsuario ? View.GONE : View.VISIBLE);
+        holder.btnOpcionesEquipo.setVisibility((esUsuarioLider && !esMismoUsuario) ? View.VISIBLE : View.GONE);
 
         holder.btnOpcionesEquipo.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(context, holder.btnOpcionesEquipo);
@@ -106,7 +112,7 @@ public class EquipoAdapter extends RecyclerView.Adapter<EquipoAdapter.EquipoView
                 context, android.R.layout.simple_spinner_dropdown_item, roles);
         spRol.setAdapter(adapterRol);
 
-        if ("Lider".equalsIgnoreCase(item.rol) || "Líder".equalsIgnoreCase(item.rol)) {
+        if (cEquipo.esRolLider(item.rol)) {
             spRol.setSelection(0);
         } else if ("Observador".equalsIgnoreCase(item.rol)) {
             spRol.setSelection(2);
@@ -119,15 +125,16 @@ public class EquipoAdapter extends RecyclerView.Adapter<EquipoAdapter.EquipoView
 
         builder.setPositiveButton("Guardar", (dialog, which) -> {
             String nuevoRol = spRol.getSelectedItem().toString();
+            String idSolicitante = Sesion.getIdUsuario(context);
             new Thread(() -> {
-                boolean exito = equipoControlador.actualizarRol(item.idRelacion, nuevoRol);
+                boolean exito = equipoControlador.actualizarRol(item.idRelacion, nuevoRol, idSolicitante);
                 ejecutarEnUi(() -> {
                     if (exito) {
                         item.rol = nuevoRol;
                         notifyDataSetChanged();
                         Toast.makeText(context, "Rol actualizado correctamente", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "Error al actualizar el rol", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "No tienes permiso o hubo un error al actualizar", Toast.LENGTH_SHORT).show();
                     }
                 });
             }).start();
@@ -141,20 +148,21 @@ public class EquipoAdapter extends RecyclerView.Adapter<EquipoAdapter.EquipoView
         String nombre = item.usuario != null && item.usuario.getNombreCompleto() != null
                 ? item.usuario.getNombreCompleto()
                 : "este miembro";
+        String idSolicitante = Sesion.getIdUsuario(context);
 
         new MaterialAlertDialogBuilder(context)
                 .setTitle("Eliminar Miembro")
                 .setMessage("¿Desea eliminar a " + nombre + " del proyecto?")
                 .setPositiveButton("Eliminar", (dialog, which) -> {
                     new Thread(() -> {
-                        boolean exito = equipoControlador.eliminarMiembro(item.idRelacion);
+                        boolean exito = equipoControlador.eliminarMiembro(item.idRelacion, idSolicitante);
                         ejecutarEnUi(() -> {
                             if (exito) {
                                 listaMiembros.remove(item);
                                 notifyDataSetChanged();
                                 Toast.makeText(context, "Miembro eliminado del proyecto", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(context, "Error al eliminar el miembro", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "No tienes permiso o hubo un error al eliminar", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }).start();

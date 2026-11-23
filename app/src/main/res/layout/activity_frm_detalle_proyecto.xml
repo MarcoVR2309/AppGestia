@@ -210,6 +210,77 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
+            <!-- Barra de acciones rápidas del proyecto -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnExportarPdf"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:onClick="exportarReportePdf"
+                        android:text="Exportar PDF"
+                        android:textAllCaps="false"
+                        android:textColor="@color/primary"
+                        android:textSize="12sp"
+                        app:cornerRadius="18dp"
+                        app:strokeColor="@color/primary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCalendarioProyecto"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="8dp"
+                        android:onClick="abrirCalendarioProyecto"
+                        android:text="Calendario"
+                        android:textAllCaps="false"
+                        android:textColor="@color/primary"
+                        android:textSize="12sp"
+                        app:cornerRadius="18dp"
+                        app:strokeColor="@color/primary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClonarProyecto"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="8dp"
+                        android:onClick="mostrarDialogoClonarProyecto"
+                        android:text="Clonar plantilla"
+                        android:textAllCaps="false"
+                        android:textColor="@color/on_surface"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        app:cornerRadius="18dp"
+                        app:strokeColor="@color/outline_variant" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEliminarProyecto"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="8dp"
+                        android:onClick="confirmarEliminarProyecto"
+                        android:text="Eliminar proyecto"
+                        android:textAllCaps="false"
+                        android:textColor="@color/error"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        app:cornerRadius="18dp"
+                        app:strokeColor="@color/error" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
             <!-- SECCIÓN FASES DEL PROYECTO -->
             <LinearLayout
                 android:id="@+id/layoutFasesProyecto"

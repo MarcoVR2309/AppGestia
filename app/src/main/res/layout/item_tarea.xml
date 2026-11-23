@@ -84,6 +84,37 @@
                 android:textColor="@color/on_surface_variant"
                 android:textSize="12sp" />
 
+            <!-- Mini progreso de subtareas (visible solo si tiene subtareas) -->
+            <LinearLayout
+                android:id="@+id/layoutProgresoSubtareas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:id="@+id/progressSubtareas"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="6dp"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressTint="@color/primary" />
+
+                <TextView
+                    android:id="@+id/lblSubtareasResumen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="0/0"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <!-- Botón o indicador de estado de tarea -->

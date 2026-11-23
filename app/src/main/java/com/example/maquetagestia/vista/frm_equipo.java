@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.maquetagestia.R;
+import com.example.maquetagestia.controller.Sesion;
 import com.example.maquetagestia.controller.cEquipo;
 import com.example.maquetagestia.controller.cEquipo.MiembroEquipoItem;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -28,6 +29,8 @@ import java.util.List;
 public class frm_equipo extends AppCompatActivity {
 
     private String proyectoId;
+    private boolean esUsuarioLider = false;
+    private View btnInvitarMiembro;
     private RecyclerView rcvEquipo;
     private cEquipo equipoControlador;
     private EquipoAdapter equipoAdapter;
@@ -46,6 +49,10 @@ public class frm_equipo extends AppCompatActivity {
 
         proyectoId = getIntent().getStringExtra("PROYECTO_ID");
 
+        btnInvitarMiembro = findViewById(R.id.btnInvitarMiembro);
+        if (btnInvitarMiembro != null) {
+            btnInvitarMiembro.setVisibility(View.GONE);
+        }
         rcvEquipo = findViewById(R.id.rcvEquipo);
         if (rcvEquipo != null) {
             rcvEquipo.setLayoutManager(new LinearLayoutManager(this));
@@ -59,12 +66,18 @@ public class frm_equipo extends AppCompatActivity {
     public void cargarEquipo() {
         if (proyectoId == null || proyectoId.isEmpty()) return;
 
+        String idUsuario = Sesion.getIdUsuario(this);
         new Thread(() -> {
             List<MiembroEquipoItem> lista = equipoControlador.listarEquipoPorProyecto(proyectoId);
+            boolean esLider = equipoControlador.esLiderDelProyecto(proyectoId, idUsuario);
 
             runOnUiThread(() -> {
+                esUsuarioLider = esLider;
+                if (btnInvitarMiembro != null) {
+                    btnInvitarMiembro.setVisibility(esLider ? View.VISIBLE : View.GONE);
+                }
                 if (rcvEquipo != null) {
-                    equipoAdapter = new EquipoAdapter(frm_equipo.this, lista);
+                    equipoAdapter = new EquipoAdapter(frm_equipo.this, lista, esLider);
                     rcvEquipo.setAdapter(equipoAdapter);
                 }
             });
@@ -83,7 +96,12 @@ public class frm_equipo extends AppCompatActivity {
 
     public void asignarMiembros(View view) {
         if (proyectoId == null || proyectoId.isEmpty()) return;
+        if (!esUsuarioLider) {
+            Toast.makeText(this, "Solo el Líder del proyecto puede invitar miembros", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        String idUsuarioActual = Sesion.getIdUsuario(this);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle("Invitar Miembro al Equipo");
 
@@ -106,7 +124,7 @@ public class frm_equipo extends AppCompatActivity {
             }
 
             new Thread(() -> {
-                boolean exito = equipoControlador.agregarMiembroEquipo(proyectoId, correo, rolSel);
+                boolean exito = equipoControlador.agregarMiembroEquipo(proyectoId, correo, rolSel, idUsuarioActual);
                 runOnUiThread(() -> {
                     if (exito) {
                         Toast.makeText(frm_equipo.this, "¡Invitación enviada al usuario!", Toast.LENGTH_SHORT).show();

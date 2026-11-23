@@ -19,6 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/btnCalendarioHome"
             android:orientation="vertical">
 
             <TextView
@@ -39,6 +40,20 @@
                 android:textColor="@color/on_surface_variant"
                 android:textSize="14sp" />
         </LinearLayout>
+
+        <!-- Botón Calendario -->
+        <ImageButton
+            android:id="@+id/btnCalendarioHome"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toStartOf="@id/btnNotifications"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Calendario de entregas"
+            android:onClick="abrirCalendarioHome"
+            android:src="@drawable/ic_calendar_today"
+            app:tint="@color/primary" />
 
         <!-- Botón Notificaciones -->
         <ImageButton
@@ -68,6 +83,74 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
+            <!-- BÚSQUEDA GLOBAL RÁPIDA -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/surface_container_lowest"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:strokeColor="@color/outline_variant">
+
+                <EditText
+                    android:id="@+id/txtBusquedaGlobal"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:background="@android:color/transparent"
+                    android:drawableStart="@drawable/ic_search"
+                    android:drawablePadding="10dp"
+                    android:hint="Buscar proyectos o tareas..."
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingHorizontal="14dp"
+                    android:textColor="@color/on_surface"
+                    android:textColorHint="@color/on_surface_variant"
+                    android:textSize="14sp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- RESULTADOS AGRUPADOS DE BÚSQUEDA -->
+            <LinearLayout
+                android:id="@+id/layoutResultadosBusqueda"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Proyectos"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/containerResultadosProyectos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Tareas"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/containerResultadosTareas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="vertical" />
+            </LinearLayout>
 
             <!-- KPI GRILLA 2x2 -->
             <GridLayout

@@ -177,14 +177,35 @@ public class cTarea {
         }
     }
 
-    // Listar tareas pertenecientes a un proyecto consultando por Tarea.proyecto_id y su responsable (si existe)
+    private Tarea mapearTareaDesdeResultSet(ResultSet rs) throws Exception {
+        Tarea t = new Tarea();
+        t.setId(rs.getString("id"));
+        t.setProyectoId(rs.getString("proyecto_id"));
+        t.setFaseId(rs.getString("fase_id"));
+        t.setTitulo(rs.getString("titulo"));
+        t.setInstrucciones(rs.getString("instrucciones"));
+        t.setPrioridad(rs.getString("prioridad"));
+        t.setEstado(rs.getString("estado"));
+        t.setFechaLimite(extraerFechaCorta(rs.getString("fecha_limite")));
+        String respId = rs.getString("responsable_id");
+        t.setResponsableId(respId);
+        t.setAsignadoA(respId);
+        t.setResponsableNombre(rs.getString("responsable_nombre"));
+        t.setTotalSubtareas(rs.getInt("total_subtareas"));
+        t.setSubtareasCompletadas(rs.getInt("subtareas_completadas"));
+        return t;
+    }
+
+    // Listar tareas pertenecientes a un proyecto consultando por Tarea.proyecto_id, responsable y subtareas
     public List<Tarea> listarTareasPorProyecto(String idProyecto) {
         List<Tarea> lista = new ArrayList<>();
         Connection con = conexionHelper.conectar();
         if (con == null) return lista;
 
         String sql = "SELECT t.id, t.proyecto_id, t.fase_id, t.titulo, t.instrucciones, t.prioridad, t.estado, t.fecha_limite, " +
-                     "tr.usuario_id AS responsable_id, u.nombre_completo AS responsable_nombre " +
+                     "tr.usuario_id AS responsable_id, u.nombre_completo AS responsable_nombre, " +
+                     "(SELECT COUNT(*) FROM Subtarea s WHERE s.tarea_id = t.id) AS total_subtareas, " +
+                     "(SELECT ISNULL(SUM(CASE WHEN s.completada = 1 THEN 1 ELSE 0 END), 0) FROM Subtarea s WHERE s.tarea_id = t.id) AS subtareas_completadas " +
                      "FROM Tarea t " +
                      "LEFT JOIN Tarea_Responsable tr ON t.id = tr.tarea_id " +
                      "LEFT JOIN Usuario u ON tr.usuario_id = u.id " +
@@ -196,20 +217,7 @@ public class cTarea {
             ps.setString(1, idProyecto);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Tarea t = new Tarea();
-                    t.setId(rs.getString("id"));
-                    t.setProyectoId(rs.getString("proyecto_id"));
-                    t.setFaseId(rs.getString("fase_id"));
-                    t.setTitulo(rs.getString("titulo"));
-                    t.setInstrucciones(rs.getString("instrucciones"));
-                    t.setPrioridad(rs.getString("prioridad"));
-                    t.setEstado(rs.getString("estado"));
-                    t.setFechaLimite(extraerFechaCorta(rs.getString("fecha_limite")));
-                    String respId = rs.getString("responsable_id");
-                    t.setResponsableId(respId);
-                    t.setAsignadoA(respId);
-                    t.setResponsableNombre(rs.getString("responsable_nombre"));
-                    lista.add(t);
+                    lista.add(mapearTareaDesdeResultSet(rs));
                 }
             }
         } catch (Exception e) {
@@ -228,7 +236,9 @@ public class cTarea {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT t.id, t.proyecto_id, t.fase_id, t.titulo, t.instrucciones, t.prioridad, t.estado, t.fecha_limite, " +
-                "tr.usuario_id AS responsable_id, u.nombre_completo AS responsable_nombre " +
+                "tr.usuario_id AS responsable_id, u.nombre_completo AS responsable_nombre, " +
+                "(SELECT COUNT(*) FROM Subtarea s WHERE s.tarea_id = t.id) AS total_subtareas, " +
+                "(SELECT ISNULL(SUM(CASE WHEN s.completada = 1 THEN 1 ELSE 0 END), 0) FROM Subtarea s WHERE s.tarea_id = t.id) AS subtareas_completadas " +
                 "FROM Tarea t " +
                 "LEFT JOIN Tarea_Responsable tr ON t.id = tr.tarea_id " +
                 "LEFT JOIN Usuario u ON tr.usuario_id = u.id " +
@@ -258,24 +268,100 @@ public class cTarea {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Tarea t = new Tarea();
-                    t.setId(rs.getString("id"));
-                    t.setProyectoId(rs.getString("proyecto_id"));
-                    t.setFaseId(rs.getString("fase_id"));
-                    t.setTitulo(rs.getString("titulo"));
-                    t.setInstrucciones(rs.getString("instrucciones"));
-                    t.setPrioridad(rs.getString("prioridad"));
-                    t.setEstado(rs.getString("estado"));
-                    t.setFechaLimite(extraerFechaCorta(rs.getString("fecha_limite")));
-                    String respId = rs.getString("responsable_id");
-                    t.setResponsableId(respId);
-                    t.setAsignadoA(respId);
-                    t.setResponsableNombre(rs.getString("responsable_nombre"));
-                    lista.add(t);
+                    lista.add(mapearTareaDesdeResultSet(rs));
                 }
             }
         } catch (Exception e) {
             Log.e("CRUD_TAREA", "Error al listar tareas por usuario y estado: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    // Listar tareas con fecha límite para la vista de calendario (de un proyecto o de todos los proyectos del usuario)
+    public List<Tarea> listarTareasConFechaPorUsuario(String idUsuario, String idProyectoOpcional) {
+        List<Tarea> lista = new ArrayList<>();
+        if (idUsuario == null || idUsuario.trim().isEmpty()) return lista;
+
+        Connection con = conexionHelper.conectar();
+        if (con == null) return lista;
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT DISTINCT t.id, t.proyecto_id, t.fase_id, t.titulo, t.instrucciones, t.prioridad, t.estado, t.fecha_limite, " +
+                "tr.usuario_id AS responsable_id, u.nombre_completo AS responsable_nombre, " +
+                "(SELECT COUNT(*) FROM Subtarea s WHERE s.tarea_id = t.id) AS total_subtareas, " +
+                "(SELECT ISNULL(SUM(CASE WHEN s.completada = 1 THEN 1 ELSE 0 END), 0) FROM Subtarea s WHERE s.tarea_id = t.id) AS subtareas_completadas " +
+                "FROM Tarea t " +
+                "LEFT JOIN Tarea_Responsable tr ON t.id = tr.tarea_id " +
+                "LEFT JOIN Usuario u ON tr.usuario_id = u.id " +
+                "WHERE t.fecha_limite IS NOT NULL "
+        );
+
+        boolean porProyecto = idProyectoOpcional != null && !idProyectoOpcional.trim().isEmpty();
+        if (porProyecto) {
+            sql.append("AND t.proyecto_id = ? ");
+        } else {
+            sql.append("AND (tr.usuario_id = ? OR EXISTS (SELECT 1 FROM Proyecto_Usuario pu WHERE pu.proyecto_id = t.proyecto_id AND pu.usuario_id = ?)) ");
+        }
+        sql.append("ORDER BY t.fecha_limite ASC");
+
+        try (Connection autoCloseCon = con;
+             PreparedStatement ps = autoCloseCon.prepareStatement(sql.toString())) {
+
+            if (porProyecto) {
+                ps.setString(1, idProyectoOpcional.trim());
+            } else {
+                ps.setString(1, idUsuario.trim());
+                ps.setString(2, idUsuario.trim());
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearTareaDesdeResultSet(rs));
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_TAREA", "Error al listar tareas con fecha: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    // Búsqueda global de tareas del usuario por título o instrucciones
+    public List<Tarea> buscarTareasGlobalPorUsuario(String idUsuario, String texto) {
+        List<Tarea> lista = new ArrayList<>();
+        if (idUsuario == null || idUsuario.trim().isEmpty()
+                || texto == null || texto.trim().isEmpty()) {
+            return lista;
+        }
+
+        Connection con = conexionHelper.conectar();
+        if (con == null) return lista;
+
+        String sql = "SELECT DISTINCT t.id, t.proyecto_id, t.fase_id, t.titulo, t.instrucciones, t.prioridad, t.estado, t.fecha_limite, " +
+                     "tr.usuario_id AS responsable_id, u.nombre_completo AS responsable_nombre, " +
+                     "(SELECT COUNT(*) FROM Subtarea s WHERE s.tarea_id = t.id) AS total_subtareas, " +
+                     "(SELECT ISNULL(SUM(CASE WHEN s.completada = 1 THEN 1 ELSE 0 END), 0) FROM Subtarea s WHERE s.tarea_id = t.id) AS subtareas_completadas " +
+                     "FROM Tarea t " +
+                     "LEFT JOIN Tarea_Responsable tr ON t.id = tr.tarea_id " +
+                     "LEFT JOIN Usuario u ON tr.usuario_id = u.id " +
+                     "WHERE (tr.usuario_id = ? OR EXISTS (SELECT 1 FROM Proyecto_Usuario pu WHERE pu.proyecto_id = t.proyecto_id AND pu.usuario_id = ?)) " +
+                     "AND (t.titulo LIKE ? OR ISNULL(t.instrucciones, '') LIKE ?) " +
+                     "ORDER BY t.created_at DESC";
+
+        String patron = "%" + texto.trim() + "%";
+        try (Connection autoCloseCon = con;
+             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+            ps.setString(1, idUsuario.trim());
+            ps.setString(2, idUsuario.trim());
+            ps.setString(3, patron);
+            ps.setString(4, patron);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearTareaDesdeResultSet(rs));
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_TAREA", "Error en búsqueda global de tareas: " + e.getMessage());
         }
         return lista;
     }
@@ -396,20 +482,47 @@ public class cTarea {
         }
     }
 
-    // Eliminar una tarea y su asignación en Tarea_Responsable (transacción atómica)
+    // Eliminar una tarea y sus registros dependientes validando rol de líder si se indica solicitante
     public boolean eliminarTarea(String tareaId) {
+        return eliminarTarea(tareaId, null);
+    }
+
+    public boolean eliminarTarea(String tareaId, String usuarioIdSolicitante) {
         if (tareaId == null || tareaId.trim().isEmpty()) return false;
 
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
         try {
+            if (usuarioIdSolicitante != null && !usuarioIdSolicitante.trim().isEmpty()) {
+                String proyectoId = null;
+                try (PreparedStatement psPry = con.prepareStatement("SELECT proyecto_id FROM Tarea WHERE id = ?")) {
+                    psPry.setString(1, tareaId.trim());
+                    try (ResultSet rs = psPry.executeQuery()) {
+                        if (rs.next()) {
+                            proyectoId = rs.getString("proyecto_id");
+                        }
+                    }
+                }
+                if (proyectoId == null || !new cEquipo().esLiderDelProyecto(con, proyectoId, usuarioIdSolicitante.trim())) {
+                    con.close();
+                    return false;
+                }
+            }
+
             con.setAutoCommit(false);
 
-            String sqlDelResp = "DELETE FROM Tarea_Responsable WHERE tarea_id = ?";
-            try (PreparedStatement psResp = con.prepareStatement(sqlDelResp)) {
-                psResp.setString(1, tareaId.trim());
-                psResp.executeUpdate();
+            String[] tablasHijas = {
+                    "DELETE FROM ComentarioTarea WHERE tarea_id = ?",
+                    "DELETE FROM EnlaceTarea WHERE tarea_id = ?",
+                    "DELETE FROM Subtarea WHERE tarea_id = ?",
+                    "DELETE FROM Tarea_Responsable WHERE tarea_id = ?"
+            };
+            for (String sqlHija : tablasHijas) {
+                try (PreparedStatement psHija = con.prepareStatement(sqlHija)) {
+                    psHija.setString(1, tareaId.trim());
+                    psHija.executeUpdate();
+                }
             }
 
             String sqlDelTarea = "DELETE FROM Tarea WHERE id = ?";

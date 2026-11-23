@@ -404,4 +404,8 @@ public class frm_proyectos extends AppCompatActivity {
         builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
         builder.show();
     }
+
+    public void abrirCalendario(View view) {
+        startActivity(new Intent(this, frm_calendario.class));
+    }
 }

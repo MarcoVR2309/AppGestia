@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.maquetagestia.R;
+import com.example.maquetagestia.controller.Sesion;
 import com.example.maquetagestia.controller.cFase;
 import com.example.maquetagestia.model.Fase;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -39,15 +40,21 @@ public class FaseStepperAdapter extends RecyclerView.Adapter<FaseStepperAdapter.
     private final Context context;
     private final List<Fase> listaFases;
     private final OnFaseActualizadaListener listener;
+    private final boolean esUsuarioLider;
 
     public FaseStepperAdapter(Context context, List<Fase> listaFases) {
-        this(context, listaFases, null);
+        this(context, listaFases, null, true);
     }
 
     public FaseStepperAdapter(Context context, List<Fase> listaFases, OnFaseActualizadaListener listener) {
+        this(context, listaFases, listener, true);
+    }
+
+    public FaseStepperAdapter(Context context, List<Fase> listaFases, OnFaseActualizadaListener listener, boolean esUsuarioLider) {
         this.context = context;
         this.listaFases = listaFases;
         this.listener = listener;
+        this.esUsuarioLider = esUsuarioLider;
     }
 
     @NonNull
@@ -94,7 +101,12 @@ public class FaseStepperAdapter extends RecyclerView.Adapter<FaseStepperAdapter.
             holder.lblEstado.setBackgroundColor(ContextCompat.getColor(context, R.color.surface_container_low));
         }
 
-        holder.btnEditarFase.setOnClickListener(v -> mostrarDialogoEditarFase(holder, f));
+        holder.btnEditarFase.setVisibility(esUsuarioLider ? View.VISIBLE : View.GONE);
+        holder.btnEditarFase.setOnClickListener(v -> {
+            if (esUsuarioLider) {
+                mostrarDialogoEditarFase(holder, f);
+            }
+        });
     }
 
     private void mostrarDialogoEditarFase(@NonNull FaseViewHolder holder, @NonNull Fase f) {
@@ -170,8 +182,9 @@ public class FaseStepperAdapter extends RecyclerView.Adapter<FaseStepperAdapter.
             );
 
             cFase faseControlador = new cFase();
+            String idSolicitante = Sesion.getIdUsuario(context);
             new Thread(() -> {
-                boolean exito = faseControlador.actualizarFase(faseActualizada);
+                boolean exito = faseControlador.actualizarFase(faseActualizada, idSolicitante);
                 ejecutarEnUi(() -> {
                     if (exito) {
                         f.setNombre(faseActualizada.getNombre());
@@ -203,8 +216,9 @@ public class FaseStepperAdapter extends RecyclerView.Adapter<FaseStepperAdapter.
                 .setMessage("¿Seguro que deseas eliminar la fase \"" + f.getNombre() + "\"? Las tareas vinculadas se conservarán sin fase asignada.")
                 .setPositiveButton("Eliminar", (dialog, which) -> {
                     cFase faseControlador = new cFase();
+                    String idSolicitante = Sesion.getIdUsuario(context);
                     new Thread(() -> {
-                        boolean exito = faseControlador.eliminarFase(f.getId());
+                        boolean exito = faseControlador.eliminarFase(f.getId(), idSolicitante);
                         ejecutarEnUi(() -> {
                             if (exito) {
                                 int pos = holder.getBindingAdapterPosition();

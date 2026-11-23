@@ -72,8 +72,16 @@ public class cFase {
 
     // Insertar una nueva fase personalizada con ID FAS000001 y orden correlativo en SQL Server
     public boolean crearFase(String proyectoId, String nombre, String fechaEstimada) {
+        return crearFase(proyectoId, nombre, fechaEstimada, null);
+    }
+
+    public boolean crearFase(String proyectoId, String nombre, String fechaEstimada, String usuarioIdSolicitante) {
         if (proyectoId == null || proyectoId.trim().isEmpty()
                 || nombre == null || nombre.trim().isEmpty()) {
+            return false;
+        }
+        if (usuarioIdSolicitante != null && !usuarioIdSolicitante.trim().isEmpty()
+                && !new cEquipo().esLiderDelProyecto(proyectoId.trim(), usuarioIdSolicitante.trim())) {
             return false;
         }
 
@@ -140,6 +148,10 @@ public class cFase {
 
     // Actualizar nombre, fecha estimada y estado de una fase existente en SQL Server
     public boolean actualizarFase(Fase f) {
+        return actualizarFase(f, null);
+    }
+
+    public boolean actualizarFase(Fase f, String usuarioIdSolicitante) {
         if (f == null || f.getId() == null || f.getId().trim().isEmpty()
                 || f.getNombre() == null || f.getNombre().trim().isEmpty()) {
             return false;
@@ -154,26 +166,33 @@ public class cFase {
                 ? f.getEstado().trim()
                 : "Pendiente";
 
-        String sql = "UPDATE Fase SET nombre = ?, fecha_estimada = ?, estado = ? WHERE id = ?";
-        try (Connection autoCloseCon = con;
-             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
-
-            ps.setString(1, nombreLimpio);
-            if (fechaLimpia != null) {
-                ps.setString(2, fechaLimpia);
-            } else {
-                ps.setNull(2, java.sql.Types.DATE);
+        try (Connection autoCloseCon = con) {
+            if (usuarioIdSolicitante != null && !usuarioIdSolicitante.trim().isEmpty()) {
+                String proyectoReal = obtenerProyectoIdPorFase(autoCloseCon, f.getId().trim());
+                if (proyectoReal == null || !new cEquipo().esLiderDelProyecto(autoCloseCon, proyectoReal, usuarioIdSolicitante.trim())) {
+                    return false;
+                }
             }
-            ps.setString(3, estadoLimpio);
-            ps.setString(4, f.getId().trim());
 
-            boolean actualizado = ps.executeUpdate() > 0;
-            if (actualizado) {
-                f.setNombre(nombreLimpio);
-                f.setFechaEstimada(fechaLimpia);
-                f.setEstado(estadoLimpio);
+            String sql = "UPDATE Fase SET nombre = ?, fecha_estimada = ?, estado = ? WHERE id = ?";
+            try (PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+                ps.setString(1, nombreLimpio);
+                if (fechaLimpia != null) {
+                    ps.setString(2, fechaLimpia);
+                } else {
+                    ps.setNull(2, java.sql.Types.DATE);
+                }
+                ps.setString(3, estadoLimpio);
+                ps.setString(4, f.getId().trim());
+
+                boolean actualizado = ps.executeUpdate() > 0;
+                if (actualizado) {
+                    f.setNombre(nombreLimpio);
+                    f.setFechaEstimada(fechaLimpia);
+                    f.setEstado(estadoLimpio);
+                }
+                return actualizado;
             }
-            return actualizado;
         } catch (Exception e) {
             Log.e("CRUD_FASE", "Error al actualizar fase: " + e.getMessage());
             return false;
@@ -182,12 +201,24 @@ public class cFase {
 
     // Eliminar una fase desvinculando primero sus tareas asociadas (transacción atómica)
     public boolean eliminarFase(String faseId) {
+        return eliminarFase(faseId, null);
+    }
+
+    public boolean eliminarFase(String faseId, String usuarioIdSolicitante) {
         if (faseId == null || faseId.trim().isEmpty()) return false;
 
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
         try {
+            if (usuarioIdSolicitante != null && !usuarioIdSolicitante.trim().isEmpty()) {
+                String proyectoReal = obtenerProyectoIdPorFase(con, faseId.trim());
+                if (proyectoReal == null || !new cEquipo().esLiderDelProyecto(con, proyectoReal, usuarioIdSolicitante.trim())) {
+                    con.close();
+                    return false;
+                }
+            }
+
             con.setAutoCommit(false);
 
             String sqlDesvincular = "UPDATE Tarea SET fase_id = NULL WHERE fase_id = ?";
@@ -224,6 +255,21 @@ public class cFase {
             }
             return false;
         }
+    }
+
+    private String obtenerProyectoIdPorFase(Connection con, String faseId) {
+        String sql = "SELECT proyecto_id FROM Fase WHERE id = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, faseId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("proyecto_id");
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_FASE", "Error obteniendo proyecto de fase: " + e.getMessage());
+        }
+        return null;
     }
 
     // Listar las fases pertenecientes a un proyecto ordenadas por orden correlativo

@@ -14,6 +14,8 @@ public class Tarea {
     private String createdAt;
     private String responsableId;
     private String responsableNombre;
+    private int totalSubtareas;
+    private int subtareasCompletadas;
 
     public Tarea() {
     }
@@ -148,6 +150,22 @@ public class Tarea {
 
     public void setResponsableNombre(String responsableNombre) {
         this.responsableNombre = responsableNombre;
+    }
+
+    public int getTotalSubtareas() {
+        return totalSubtareas;
+    }
+
+    public void setTotalSubtareas(int totalSubtareas) {
+        this.totalSubtareas = totalSubtareas;
+    }
+
+    public int getSubtareasCompletadas() {
+        return subtareasCompletadas;
+    }
+
+    public void setSubtareasCompletadas(int subtareasCompletadas) {
+        this.subtareasCompletadas = subtareasCompletadas;
     }
 
     @Override

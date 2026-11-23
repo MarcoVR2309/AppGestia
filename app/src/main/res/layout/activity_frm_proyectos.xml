@@ -37,6 +37,19 @@
             android:textStyle="bold" />
 
         <ImageButton
+            android:id="@+id/btnCalendarioProyectos"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toStartOf="@id/btnFiltrar"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Calendario de entregas"
+            android:onClick="abrirCalendario"
+            android:src="@drawable/ic_calendar_today"
+            app:tint="@color/primary" />
+
+        <ImageButton
             android:id="@+id/btnFiltrar"
             android:layout_width="40dp"
             android:layout_height="40dp"

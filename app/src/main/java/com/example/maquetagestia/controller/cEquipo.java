@@ -9,8 +9,10 @@ import com.example.maquetagestia.model.Usuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class cEquipo {
 
@@ -53,10 +55,18 @@ public class cEquipo {
         }
     }
 
+    public static boolean esRolLider(String rol) {
+        if (rol == null) return false;
+        String limpio = Normalizer.normalize(rol.trim(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(Locale.ROOT);
+        return "lider".equals(limpio);
+    }
+
     private String normalizarRol(String rol) {
         if (rol == null || rol.trim().isEmpty()) return "Colaborador";
         String r = rol.trim();
-        if ("Lider".equalsIgnoreCase(r) || "Líder".equalsIgnoreCase(r)) return "Lider";
+        if (esRolLider(r)) return "Lider";
         if ("Observador".equalsIgnoreCase(r)) return "Observador";
         return "Colaborador";
     }
@@ -94,46 +104,153 @@ public class cEquipo {
         return lista;
     }
 
-    // Actualizar rol de un miembro en Proyecto_Usuario
+    // Consultar el rol almacenado en Proyecto_Usuario para el usuario en sesión
+    public String obtenerRolUsuarioEnProyecto(Connection con, String idProyecto, String idUsuario) {
+        if (con == null || idProyecto == null || idProyecto.trim().isEmpty()
+                || idUsuario == null || idUsuario.trim().isEmpty()) {
+            return null;
+        }
+        String sql = "SELECT TOP 1 rol FROM Proyecto_Usuario WHERE proyecto_id = ? AND usuario_id = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, idProyecto.trim());
+            ps.setString(2, idUsuario.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("rol");
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_EQUIPO", "Error al obtener rol del usuario: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public String obtenerRolUsuarioEnProyecto(String idProyecto, String idUsuario) {
+        Connection con = conexionHelper.conectar();
+        if (con == null) return null;
+        try (Connection autoCloseCon = con) {
+            return obtenerRolUsuarioEnProyecto(autoCloseCon, idProyecto, idUsuario);
+        } catch (Exception e) {
+            Log.e("CRUD_EQUIPO", "Error en obtenerRolUsuarioEnProyecto: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public boolean esLiderDelProyecto(Connection con, String idProyecto, String idUsuario) {
+        if (con == null || idProyecto == null || idProyecto.trim().isEmpty()
+                || idUsuario == null || idUsuario.trim().isEmpty()) {
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM Proyecto_Usuario " +
+                "WHERE proyecto_id = ? AND usuario_id = ? " +
+                "AND LOWER(LTRIM(RTRIM(rol))) IN (N'lider', N'líder')";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, idProyecto.trim());
+            ps.setString(2, idUsuario.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_EQUIPO", "Error al verificar líder en SQL: " + e.getMessage());
+        }
+        return esRolLider(obtenerRolUsuarioEnProyecto(con, idProyecto, idUsuario));
+    }
+
+    public boolean esLiderDelProyecto(String idProyecto, String idUsuario) {
+        Connection con = conexionHelper.conectar();
+        if (con == null) return false;
+        try (Connection autoCloseCon = con) {
+            return esLiderDelProyecto(autoCloseCon, idProyecto, idUsuario);
+        } catch (Exception e) {
+            Log.e("CRUD_EQUIPO", "Error en esLiderDelProyecto: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Actualizar rol de un miembro en Proyecto_Usuario (validando rol de Líder si se indica solicitante)
     public boolean actualizarRol(String idRelacion, String nuevoRol) {
+        return actualizarRol(idRelacion, nuevoRol, null);
+    }
+
+    public boolean actualizarRol(String idRelacion, String nuevoRol, String usuarioIdSolicitante) {
         if (idRelacion == null || idRelacion.trim().isEmpty()) return false;
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
         String rolNormalizado = normalizarRol(nuevoRol);
-        String sql = "UPDATE Proyecto_Usuario SET rol = ? WHERE id = ?";
 
-        try (Connection autoCloseCon = con;
-             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
-            ps.setString(1, rolNormalizado);
-            ps.setString(2, idRelacion.trim());
-            return ps.executeUpdate() > 0;
+        try (Connection autoCloseCon = con) {
+            if (usuarioIdSolicitante != null && !usuarioIdSolicitante.trim().isEmpty()) {
+                String proyectoId = obtenerProyectoPorRelacion(autoCloseCon, idRelacion.trim());
+                if (proyectoId == null || !esLiderDelProyecto(autoCloseCon, proyectoId, usuarioIdSolicitante.trim())) {
+                    return false;
+                }
+            }
+
+            String sql = "UPDATE Proyecto_Usuario SET rol = ? WHERE id = ?";
+            try (PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+                ps.setString(1, rolNormalizado);
+                ps.setString(2, idRelacion.trim());
+                return ps.executeUpdate() > 0;
+            }
         } catch (Exception e) {
             Log.e("CRUD_EQUIPO", "Error al actualizar rol del miembro: " + e.getMessage());
             return false;
         }
     }
 
-    // Eliminar un miembro de Proyecto_Usuario
+    // Eliminar un miembro de Proyecto_Usuario (validando rol de Líder si se indica solicitante)
     public boolean eliminarMiembro(String idRelacion) {
+        return eliminarMiembro(idRelacion, null);
+    }
+
+    public boolean eliminarMiembro(String idRelacion, String usuarioIdSolicitante) {
         if (idRelacion == null || idRelacion.trim().isEmpty()) return false;
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
-        String sql = "DELETE FROM Proyecto_Usuario WHERE id = ?";
+        try (Connection autoCloseCon = con) {
+            if (usuarioIdSolicitante != null && !usuarioIdSolicitante.trim().isEmpty()) {
+                String proyectoId = obtenerProyectoPorRelacion(autoCloseCon, idRelacion.trim());
+                if (proyectoId == null || !esLiderDelProyecto(autoCloseCon, proyectoId, usuarioIdSolicitante.trim())) {
+                    return false;
+                }
+            }
 
-        try (Connection autoCloseCon = con;
-             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
-            ps.setString(1, idRelacion.trim());
-            return ps.executeUpdate() > 0;
+            String sql = "DELETE FROM Proyecto_Usuario WHERE id = ?";
+            try (PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+                ps.setString(1, idRelacion.trim());
+                return ps.executeUpdate() > 0;
+            }
         } catch (Exception e) {
             Log.e("CRUD_EQUIPO", "Error al eliminar miembro del proyecto: " + e.getMessage());
             return false;
         }
     }
 
+    private String obtenerProyectoPorRelacion(Connection con, String idRelacion) {
+        String sql = "SELECT proyecto_id FROM Proyecto_Usuario WHERE id = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, idRelacion);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("proyecto_id");
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_EQUIPO", "Error obteniendo proyecto por relación: " + e.getMessage());
+        }
+        return null;
+    }
+
     // Enviar invitación al proyecto mediante Notificación (sin insertar aún en Proyecto_Usuario)
     public boolean agregarMiembroEquipo(String idProyecto, String idUsuario, String rol) {
+        return agregarMiembroEquipo(idProyecto, idUsuario, rol, null);
+    }
+
+    public boolean agregarMiembroEquipo(String idProyecto, String idUsuario, String rol, String usuarioIdSolicitante) {
         if (idProyecto == null || idProyecto.trim().isEmpty()
                 || idUsuario == null || idUsuario.trim().isEmpty()) {
             return false;
@@ -143,6 +260,10 @@ public class cEquipo {
         if (con == null) return false;
 
         try (Connection autoCloseCon = con) {
+            if (usuarioIdSolicitante != null && !usuarioIdSolicitante.trim().isEmpty()
+                    && !esLiderDelProyecto(autoCloseCon, idProyecto.trim(), usuarioIdSolicitante.trim())) {
+                return false;
+            }
             // 1. Buscar ID del usuario por su ID o correo
             String sqlBusqueda = "SELECT id FROM Usuario WHERE id = ? OR correo = ?";
             String idUsuarioDestino = null;
