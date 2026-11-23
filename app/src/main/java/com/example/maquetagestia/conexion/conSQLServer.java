@@ -10,11 +10,13 @@ public class conSQLServer {
     // PARÁMETROS DE CONEXIÓN
     // - para app en el Emulador de Android Studio: usa "10.0.2.2" (localhost de mi pc).
     // - para app en un Celular físico por WiFi: IP local de tu pc (ej. "192.168.1.15").
-    private static final String IP = "10.0.2.2";
+    private static final String IP = "100.113.145.48";
     private static final String PUERTO = "1433";
     private static final String BASE_DATOS = "GESTIA";
     private static final String USUARIO = "sa";
     private static final String PASSWORD = "Admin12345";
+
+    String url = "jdbc:jtds:sqlserver://" + IP + ":" + PUERTO + "/" + BASE_DATOS + ";loginTimeout=10;";
 
     public Connection conectar() {
         Connection conexion = null;
