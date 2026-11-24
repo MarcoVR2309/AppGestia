@@ -21,13 +21,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_marginEnd="8dp"
             android:layout_toStartOf="@id/containerAccion"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/lblTituloTarea"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:text="Título de la tarea"
                 android:textColor="@color/on_surface"
                 android:textSize="15sp"
@@ -35,7 +38,7 @@
 
             <TextView
                 android:id="@+id/lblInstruccionesTarea"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:ellipsize="end"
@@ -45,7 +48,7 @@
                 android:textSize="12sp" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
@@ -56,6 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@color/error_container"
+                    android:maxLines="1"
                     android:paddingStart="8dp"
                     android:paddingTop="2dp"
                     android:paddingEnd="8dp"
@@ -67,9 +71,12 @@
 
                 <TextView
                     android:id="@+id/lblFechaLimiteTarea"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text="Límite: 15 Oct"
                     android:textColor="@color/outline"
                     android:textSize="11sp" />
@@ -77,9 +84,11 @@
 
             <TextView
                 android:id="@+id/lblResponsableTarea"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Responsable: Sin asignar"
                 android:textColor="@color/on_surface_variant"
                 android:textSize="12sp" />
@@ -128,8 +137,8 @@
 
             <ImageButton
                 android:id="@+id/btnCambiarEstado"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Cambiar estado"
                 android:src="@drawable/ic_check_circle"

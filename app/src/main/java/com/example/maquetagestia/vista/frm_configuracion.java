@@ -1,6 +1,9 @@
 package com.example.maquetagestia.vista;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
@@ -70,6 +73,21 @@ public class frm_configuracion extends AppCompatActivity {
 
     public void volverAlPerfil(View view) {
         finish();
+    }
+
+    public void abrirAjustesBateriaNotificaciones(View view) {
+        try {
+            Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            startActivity(intent);
+        } catch (Exception e) {
+            try {
+                Intent fallback = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                fallback.setData(Uri.fromParts("package", getPackageName(), null));
+                startActivity(fallback);
+            } catch (Exception ex) {
+                Toast.makeText(this, "No se pudo abrir la configuración del dispositivo", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     public void mostrarDialogoIdioma(View view) {

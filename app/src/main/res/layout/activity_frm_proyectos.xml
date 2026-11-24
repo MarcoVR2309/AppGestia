@@ -28,9 +28,15 @@
             app:tint="@color/primary" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="8dp"
+            android:layout_toStartOf="@id/btnCalendarioProyectos"
+            android:layout_toEndOf="@id/btnVolver"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
             android:text="Mis proyectos"
             android:textColor="@color/primary"
             android:textSize="20sp"
@@ -76,29 +82,34 @@
         app:tint="@color/on_primary" />
 
     <!-- 2. CONTENIDO DESPLAZABLE -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/headerProyectos"
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="88dp">
 
             <!-- Buscador -->
             <EditText
                 android:id="@+id/txtBuscarProyecto"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/ic_launcher_background"
                 android:backgroundTint="@color/surface_container_lowest"
                 android:drawableStart="@drawable/ic_search"
                 android:drawablePadding="12dp"
                 android:hint="Buscar proyectos..."
                 android:inputType="text"
+                android:maxLines="1"
+                android:minHeight="48dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:textColor="@color/on_surface"
@@ -109,6 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:clipToPadding="false"
                 android:scrollbars="none">
 
                 <LinearLayout
@@ -119,8 +131,10 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnChipTodos"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:backgroundTint="@color/primary_container"
+                        android:maxLines="1"
+                        android:minHeight="40dp"
                         android:text="Todos"
                         android:textAllCaps="false"
                         android:textColor="@color/on_primary"
@@ -131,8 +145,10 @@
                         android:id="@+id/btnChipActivos"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:maxLines="1"
+                        android:minHeight="40dp"
                         android:text="Activos"
                         android:textAllCaps="false"
                         android:textColor="@color/on_surface_variant"
@@ -144,8 +160,10 @@
                         android:id="@+id/btnChipAcademicos"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:maxLines="1"
+                        android:minHeight="40dp"
                         android:text="Académicos"
                         android:textAllCaps="false"
                         android:textColor="@color/on_surface_variant"
@@ -157,8 +175,10 @@
                         android:id="@+id/btnChipEmpresariales"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:maxLines="1"
+                        android:minHeight="40dp"
                         android:text="Empresariales"
                         android:textAllCaps="false"
                         android:textColor="@color/on_surface_variant"
@@ -200,6 +220,6 @@
                 android:visibility="gone" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>

@@ -28,9 +28,16 @@
             app:tint="@color/primary" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="8dp"
+            android:layout_toStartOf="@id/btnInvitarMiembro"
+            android:layout_toEndOf="@id/btnVolverEquipo"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
             android:text="Equipo"
             android:textColor="@color/primary"
             android:textSize="20sp"
@@ -53,10 +60,11 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAsignarMiembros"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
         android:backgroundTint="@color/primary_container"
+        android:minHeight="48dp"
         android:onClick="abrirPantallaTareas"
         android:text="Asignar miembros a tareas"
         android:textAllCaps="false"
@@ -64,19 +72,22 @@
         android:textSize="16sp"
         app:cornerRadius="8dp" />
 
-    <!-- 3. CONTENIDO DESPLAZABLE (ScrollView) -->
-    <ScrollView
+    <!-- 3. CONTENIDO DESPLAZABLE (NestedScrollView) -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/btnAsignarMiembros"
         android:layout_below="@id/headerEquipo"
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
             <!-- SECCIÓN MIEMBROS -->
             <TextView
@@ -98,6 +109,6 @@
                 tools:listitem="@layout/item_equipo" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>

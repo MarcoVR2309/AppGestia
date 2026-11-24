@@ -28,27 +28,36 @@
             app:tint="@color/primary" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="48dp"
+            android:layout_toEndOf="@id/btnVolverConfig"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
             android:text="Configuración"
             android:textColor="@color/primary"
             android:textSize="20sp"
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <!-- 2. CONTENIDO DESPLAZABLE (ScrollView) -->
-    <ScrollView
+    <!-- 2. CONTENIDO DESPLAZABLE (NestedScrollView) -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/headerConfig"
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
             <!-- PREFERENCIAS -->
             <TextView
@@ -84,6 +93,8 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentStart="true"
                             android:layout_centerVertical="true"
+                            android:layout_marginEnd="12dp"
+                            android:layout_toStartOf="@id/switchPush"
                             android:text="Notificaciones Push"
                             android:textColor="@color/on_surface"
                             android:textSize="14sp" />
@@ -112,6 +123,8 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentStart="true"
                             android:layout_centerVertical="true"
+                            android:layout_marginEnd="12dp"
+                            android:layout_toStartOf="@id/switchDark"
                             android:text="Modo oscuro"
                             android:textColor="@color/on_surface"
                             android:textSize="14sp" />
@@ -155,6 +168,45 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:text="Español >"
+                            android:textColor="@color/on_surface_variant"
+                            android:textSize="14sp" />
+                    </RelativeLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/outline_variant" />
+
+                    <!-- Notificaciones en segundo plano (sin ahorro de batería) -->
+                    <RelativeLayout
+                        android:id="@+id/rowNotificacionesSegundoPlano"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:minHeight="48dp"
+                        android:onClick="abrirAjustesBateriaNotificaciones"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="12dp"
+                            android:layout_toStartOf="@id/lblFlechaBateriaConfig"
+                            android:text="Notificaciones en segundo plano (sin ahorro de batería)"
+                            android:textColor="@color/on_surface"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/lblFlechaBateriaConfig"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:text="&gt;"
                             android:textColor="@color/on_surface_variant"
                             android:textSize="14sp" />
                     </RelativeLayout>
@@ -284,6 +336,6 @@
                 android:textSize="12sp" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>

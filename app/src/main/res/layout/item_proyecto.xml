@@ -34,9 +34,11 @@
 
         <TextView
             android:id="@+id/lblNombreProyecto"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:text="Nombre del Proyecto"
             android:textColor="@color/on_surface"
             android:textSize="16sp"
@@ -44,7 +46,7 @@
 
         <TextView
             android:id="@+id/lblDescripcionProyecto"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:ellipsize="end"
@@ -63,6 +65,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:text="Estado"
                 android:textColor="@color/on_surface_variant"
@@ -72,6 +75,8 @@
                 android:id="@+id/lblEstadoProyecto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Planificación"
                 android:textColor="@color/primary"
                 android:textSize="12sp"
@@ -108,9 +113,11 @@
 
         <TextView
             android:id="@+id/lblFechasProyecto"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="01 Sep 2026 - 30 Nov 2026"
             android:textColor="@color/outline"
             android:textSize="11sp" />

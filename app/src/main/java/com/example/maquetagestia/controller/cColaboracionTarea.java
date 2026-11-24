@@ -105,6 +105,14 @@ public class cColaboracionTarea {
         if (con == null) return false;
 
         try (Connection autoCloseCon = con) {
+            String proyectoId = obtenerProyectoIdDeTarea(autoCloseCon, tareaId.trim());
+            if (proyectoId == null) return false;
+
+            String rol = new cEquipo().obtenerRolUsuarioEnProyecto(autoCloseCon, proyectoId, usuarioId.trim());
+            if (rol == null || cEquipo.esRolObservador(rol)) {
+                return false;
+            }
+
             String idCom = generarIdSeguro(autoCloseCon, "ComentarioTarea", "id", "COM", 6);
             String sql = "INSERT INTO ComentarioTarea (id, tarea_id, usuario_id, contenido) VALUES (?, ?, ?, ?)";
             try (PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
@@ -159,6 +167,44 @@ public class cColaboracionTarea {
         return lista;
     }
 
+    public List<EnlaceTarea> listarEnlacesPorProyecto(String proyectoId) {
+        List<EnlaceTarea> lista = new ArrayList<>();
+        if (proyectoId == null || proyectoId.trim().isEmpty()) return lista;
+
+        Connection con = conexionHelper.conectar();
+        if (con == null) return lista;
+
+        String sql = "SELECT e.id, e.tarea_id, e.usuario_id, " +
+                     "ISNULL(u.nombre_completo, 'Usuario') AS autor_nombre, " +
+                     "e.titulo, e.url, CONVERT(VARCHAR(16), e.fecha_creacion, 120) AS fecha_creacion " +
+                     "FROM EnlaceTarea e " +
+                     "INNER JOIN Tarea t ON e.tarea_id = t.id " +
+                     "LEFT JOIN Usuario u ON e.usuario_id = u.id " +
+                     "WHERE t.proyecto_id = ? " +
+                     "ORDER BY e.fecha_creacion ASC, e.id ASC";
+
+        try (Connection autoCloseCon = con;
+             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+            ps.setString(1, proyectoId.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new EnlaceTarea(
+                            rs.getString("id"),
+                            rs.getString("tarea_id"),
+                            rs.getString("usuario_id"),
+                            rs.getString("autor_nombre"),
+                            rs.getString("titulo"),
+                            rs.getString("url"),
+                            rs.getString("fecha_creacion")
+                    ));
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_COLAB", "Error al listar enlaces por proyecto: " + e.getMessage());
+        }
+        return lista;
+    }
+
     public boolean crearEnlace(String tareaId, String usuarioId, String titulo, String url) {
         if (tareaId == null || tareaId.trim().isEmpty()
                 || usuarioId == null || usuarioId.trim().isEmpty()
@@ -181,6 +227,17 @@ public class cColaboracionTarea {
         if (con == null) return false;
 
         try (Connection autoCloseCon = con) {
+            String proyectoId = obtenerProyectoIdDeTarea(autoCloseCon, tareaId.trim());
+            if (proyectoId == null) return false;
+
+            String rol = new cEquipo().obtenerRolUsuarioEnProyecto(autoCloseCon, proyectoId, usuarioId.trim());
+            boolean esLider = cEquipo.esRolLider(rol);
+            boolean esColabAsignado = cEquipo.esRolColaborador(rol)
+                    && usuarioId.trim().equals(obtenerResponsableIdDeTarea(autoCloseCon, tareaId.trim()));
+            if (!esLider && !esColabAsignado) {
+                return false;
+            }
+
             String idEnl = generarIdSeguro(autoCloseCon, "EnlaceTarea", "id", "ENL", 6);
             String sql = "INSERT INTO EnlaceTarea (id, tarea_id, usuario_id, titulo, url) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
@@ -275,8 +332,13 @@ public class cColaboracionTarea {
     }
 
     public boolean crearSubtarea(String tareaId, String titulo) {
+        return false;
+    }
+
+    public boolean crearSubtarea(String tareaId, String titulo, String usuarioIdSolicitante) {
         if (tareaId == null || tareaId.trim().isEmpty()
-                || titulo == null || titulo.trim().isEmpty()) {
+                || titulo == null || titulo.trim().isEmpty()
+                || usuarioIdSolicitante == null || usuarioIdSolicitante.trim().isEmpty()) {
             return false;
         }
 
@@ -287,6 +349,11 @@ public class cColaboracionTarea {
         if (con == null) return false;
 
         try (Connection autoCloseCon = con) {
+            String proyectoId = obtenerProyectoIdDeTarea(autoCloseCon, tareaId.trim());
+            if (proyectoId == null || !new cEquipo().esLiderDelProyecto(autoCloseCon, proyectoId, usuarioIdSolicitante.trim())) {
+                return false;
+            }
+
             int siguienteOrden = 1;
             String sqlOrden = "SELECT ISNULL(MAX(orden), 0) + 1 AS next_orden FROM Subtarea WHERE tarea_id = ?";
             try (PreparedStatement psO = autoCloseCon.prepareStatement(sqlOrden)) {
@@ -314,17 +381,54 @@ public class cColaboracionTarea {
     }
 
     public boolean actualizarEstadoSubtarea(String subtareaId, boolean completada) {
-        if (subtareaId == null || subtareaId.trim().isEmpty()) return false;
+        return false;
+    }
+
+    public boolean actualizarEstadoSubtarea(String subtareaId, boolean completada, String usuarioIdSolicitante) {
+        if (subtareaId == null || subtareaId.trim().isEmpty()
+                || usuarioIdSolicitante == null || usuarioIdSolicitante.trim().isEmpty()) {
+            return false;
+        }
 
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
-        String sql = "UPDATE Subtarea SET completada = ? WHERE id = ?";
-        try (Connection autoCloseCon = con;
-             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
-            ps.setBoolean(1, completada);
-            ps.setString(2, subtareaId.trim());
-            return ps.executeUpdate() > 0;
+        String solicitante = usuarioIdSolicitante.trim();
+        try (Connection autoCloseCon = con) {
+            String proyectoId = null;
+            boolean esAsignado = false;
+            String sqlCheck = "SELECT t.proyecto_id, tr.usuario_id AS resp_id " +
+                    "FROM Subtarea s " +
+                    "INNER JOIN Tarea t ON s.tarea_id = t.id " +
+                    "LEFT JOIN Tarea_Responsable tr ON t.id = tr.tarea_id " +
+                    "WHERE s.id = ?";
+            try (PreparedStatement psCheck = autoCloseCon.prepareStatement(sqlCheck)) {
+                psCheck.setString(1, subtareaId.trim());
+                try (ResultSet rs = psCheck.executeQuery()) {
+                    while (rs.next()) {
+                        proyectoId = rs.getString("proyecto_id");
+                        String resp = rs.getString("resp_id");
+                        if (solicitante.equals(resp)) {
+                            esAsignado = true;
+                        }
+                    }
+                }
+            }
+
+            if (proyectoId == null) return false;
+
+            String rol = new cEquipo().obtenerRolUsuarioEnProyecto(autoCloseCon, proyectoId, solicitante);
+            boolean permitido = cEquipo.esRolLider(rol) || (cEquipo.esRolColaborador(rol) && esAsignado);
+            if (!permitido) {
+                return false;
+            }
+
+            String sql = "UPDATE Subtarea SET completada = ? WHERE id = ?";
+            try (PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+                ps.setBoolean(1, completada);
+                ps.setString(2, subtareaId.trim());
+                return ps.executeUpdate() > 0;
+            }
         } catch (Exception e) {
             Log.e("CRUD_COLAB", "Error al actualizar subtarea: " + e.getMessage());
             return false;
@@ -332,19 +436,72 @@ public class cColaboracionTarea {
     }
 
     public boolean eliminarSubtarea(String subtareaId) {
-        if (subtareaId == null || subtareaId.trim().isEmpty()) return false;
+        return false;
+    }
+
+    public boolean eliminarSubtarea(String subtareaId, String usuarioIdSolicitante) {
+        if (subtareaId == null || subtareaId.trim().isEmpty()
+                || usuarioIdSolicitante == null || usuarioIdSolicitante.trim().isEmpty()) {
+            return false;
+        }
 
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
-        String sql = "DELETE FROM Subtarea WHERE id = ?";
-        try (Connection autoCloseCon = con;
-             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
-            ps.setString(1, subtareaId.trim());
-            return ps.executeUpdate() > 0;
+        try (Connection autoCloseCon = con) {
+            String proyectoId = null;
+            String sqlPry = "SELECT t.proyecto_id FROM Subtarea s INNER JOIN Tarea t ON s.tarea_id = t.id WHERE s.id = ?";
+            try (PreparedStatement psPry = autoCloseCon.prepareStatement(sqlPry)) {
+                psPry.setString(1, subtareaId.trim());
+                try (ResultSet rs = psPry.executeQuery()) {
+                    if (rs.next()) {
+                        proyectoId = rs.getString("proyecto_id");
+                    }
+                }
+            }
+
+            if (proyectoId == null || !new cEquipo().esLiderDelProyecto(autoCloseCon, proyectoId, usuarioIdSolicitante.trim())) {
+                return false;
+            }
+
+            String sql = "DELETE FROM Subtarea WHERE id = ?";
+            try (PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+                ps.setString(1, subtareaId.trim());
+                return ps.executeUpdate() > 0;
+            }
         } catch (Exception e) {
             Log.e("CRUD_COLAB", "Error al eliminar subtarea: " + e.getMessage());
             return false;
         }
+    }
+
+    private String obtenerProyectoIdDeTarea(Connection con, String tareaId) {
+        if (con == null || tareaId == null) return null;
+        try (PreparedStatement ps = con.prepareStatement("SELECT proyecto_id FROM Tarea WHERE id = ?")) {
+            ps.setString(1, tareaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("proyecto_id");
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_COLAB", "Error obteniendo proyecto de tarea: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private String obtenerResponsableIdDeTarea(Connection con, String tareaId) {
+        if (con == null || tareaId == null) return null;
+        try (PreparedStatement ps = con.prepareStatement("SELECT TOP 1 usuario_id FROM Tarea_Responsable WHERE tarea_id = ?")) {
+            ps.setString(1, tareaId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("usuario_id");
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_COLAB", "Error obteniendo responsable de tarea: " + e.getMessage());
+        }
+        return null;
     }
 }

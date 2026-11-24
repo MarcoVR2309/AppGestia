@@ -28,14 +28,17 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
             android:layout_toStartOf="@id/lblRolMiembro"
             android:layout_toEndOf="@id/imgAvatarMiembro"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/lblNombreMiembro"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Nombre del Miembro"
                 android:textColor="@color/on_surface"
                 android:textSize="15sp"
@@ -43,9 +46,11 @@
 
             <TextView
                 android:id="@+id/lblCorreoMiembro"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="correo@ejemplo.com"
                 android:textColor="@color/on_surface_variant"
                 android:textSize="12sp" />
@@ -61,6 +66,8 @@
             android:layout_marginEnd="6dp"
             android:layout_toStartOf="@id/btnOpcionesEquipo"
             android:background="@color/primary_container"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:paddingStart="12dp"
             android:paddingTop="4dp"
             android:paddingEnd="12dp"
@@ -72,8 +79,8 @@
 
         <ImageButton
             android:id="@+id/btnOpcionesEquipo"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"

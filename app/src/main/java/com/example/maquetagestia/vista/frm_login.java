@@ -27,6 +27,7 @@ import androidx.credentials.exceptions.GetCredentialCancellationException;
 import androidx.credentials.exceptions.GetCredentialException;
 
 import com.example.maquetagestia.R;
+import com.example.maquetagestia.controller.AlertaVencimientoWorker;
 import com.example.maquetagestia.controller.Sesion;
 import com.example.maquetagestia.controller.cUsuario;
 import com.example.maquetagestia.controller.cUsuario.ResultadoLogin;
@@ -97,6 +98,7 @@ public class frm_login extends AppCompatActivity {
 
                 if (res.usuario != null) {
                     Sesion.guardar(frm_login.this, res.usuario);
+                    AlertaVencimientoWorker.programarTrabajosAlerta(frm_login.this, true);
                     Toast.makeText(frm_login.this, "¡Bienvenido, " + res.usuario.getNombreCompleto() + "!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(frm_login.this, MainActivity.class);
                     startActivity(intent);

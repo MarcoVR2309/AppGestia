@@ -28,9 +28,15 @@
             app:tint="@color/primary" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="8dp"
+            android:layout_toStartOf="@id/btnBuscarTarea"
+            android:layout_toEndOf="@id/btnVolverTareas"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
             android:text="Tareas"
             android:textColor="@color/primary"
             android:textSize="20sp"
@@ -62,24 +68,27 @@
         app:backgroundTint="@color/primary_container"
         app:tint="@color/on_primary" />
 
-    <!-- 3. CONTENIDO DESPLAZABLE (ScrollView) -->
-    <ScrollView
+    <!-- 3. CONTENIDO DESPLAZABLE (NestedScrollView) -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/headerTareas"
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="88dp">
 
             <!-- Buscador oculto por defecto -->
             <EditText
                 android:id="@+id/txtBuscarTarea"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:background="@drawable/ic_launcher_background"
                 android:backgroundTint="@color/surface_container_lowest"
@@ -87,6 +96,8 @@
                 android:drawablePadding="12dp"
                 android:hint="Buscar tarea por título o responsable..."
                 android:inputType="text"
+                android:maxLines="1"
+                android:minHeight="48dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:textColor="@color/on_surface"
@@ -97,6 +108,7 @@
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipToPadding="false"
                 android:scrollbars="none">
 
                 <LinearLayout
@@ -107,8 +119,10 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnFiltroTodas"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:backgroundTint="@color/primary_container"
+                        android:maxLines="1"
+                        android:minHeight="40dp"
                         android:text="Todas"
                         android:textAllCaps="false"
                         android:textColor="@color/on_primary"
@@ -119,8 +133,10 @@
                         android:id="@+id/btnFiltroPendientes"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:maxLines="1"
+                        android:minHeight="40dp"
                         android:text="Pendientes"
                         android:textAllCaps="false"
                         android:textColor="@color/on_surface_variant"
@@ -132,8 +148,10 @@
                         android:id="@+id/btnFiltroEnProgreso"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:maxLines="1"
+                        android:minHeight="40dp"
                         android:text="En Progreso"
                         android:textAllCaps="false"
                         android:textColor="@color/on_surface_variant"
@@ -145,8 +163,10 @@
                         android:id="@+id/btnFiltroCompletadas"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:maxLines="1"
+                        android:minHeight="40dp"
                         android:text="Completadas"
                         android:textAllCaps="false"
                         android:textColor="@color/on_surface_variant"
@@ -187,6 +207,6 @@
                 android:visibility="gone" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>

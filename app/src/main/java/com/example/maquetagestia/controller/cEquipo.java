@@ -63,11 +63,21 @@ public class cEquipo {
         return "lider".equals(limpio);
     }
 
+    public static boolean esRolObservador(String rol) {
+        if (rol == null) return false;
+        return "observador".equals(rol.trim().toLowerCase(Locale.ROOT));
+    }
+
+    public static boolean esRolColaborador(String rol) {
+        if (rol == null || rol.trim().isEmpty()) return false;
+        return !esRolLider(rol) && !esRolObservador(rol);
+    }
+
     private String normalizarRol(String rol) {
         if (rol == null || rol.trim().isEmpty()) return "Colaborador";
         String r = rol.trim();
         if (esRolLider(r)) return "Lider";
-        if ("Observador".equalsIgnoreCase(r)) return "Observador";
+        if (esRolObservador(r)) return "Observador";
         return "Colaborador";
     }
 

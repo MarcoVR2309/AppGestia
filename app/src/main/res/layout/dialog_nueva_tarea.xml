@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp">
 
         <!-- Título de la tarea -->
         <TextView
@@ -21,11 +24,12 @@
         <EditText
             android:id="@+id/txtTituloTareaDialog"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:backgroundTint="@color/surface_container_lowest"
             android:hint="Ej. Diseñar prototipo UI"
             android:inputType="textCapSentences"
+            android:minHeight="48dp"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:textColor="@color/on_surface"
@@ -44,11 +48,13 @@
         <EditText
             android:id="@+id/txtInstruccionesDialog"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:backgroundTint="@color/surface_container_lowest"
             android:hint="Detalles de la tarea..."
             android:inputType="textMultiLine"
+            android:maxLines="4"
+            android:minHeight="48dp"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:textColor="@color/on_surface"
@@ -67,7 +73,7 @@
         <EditText
             android:id="@+id/txtFechaLimiteDialog"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:backgroundTint="@color/surface_container_lowest"
             android:clickable="true"
@@ -76,6 +82,7 @@
             android:drawablePadding="8dp"
             android:focusable="false"
             android:hint="YYYY-MM-DD (Opcional)"
+            android:minHeight="48dp"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:textColor="@color/on_surface"
@@ -94,9 +101,10 @@
         <Spinner
             android:id="@+id/spPrioridadDialog"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:backgroundTint="@color/outline" />
+            android:backgroundTint="@color/outline"
+            android:minHeight="48dp" />
 
         <!-- Estado (visible solo al editar) -->
         <TextView
@@ -113,9 +121,10 @@
         <Spinner
             android:id="@+id/spEstadoDialog"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:backgroundTint="@color/outline"
+            android:minHeight="48dp"
             android:visibility="gone" />
 
         <!-- Fase perteneciente -->
@@ -131,9 +140,10 @@
         <Spinner
             android:id="@+id/spFaseDialog"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:backgroundTint="@color/outline" />
+            android:backgroundTint="@color/outline"
+            android:minHeight="48dp" />
 
         <!-- Asignar a responsable -->
         <TextView
@@ -148,9 +158,10 @@
         <Spinner
             android:id="@+id/spAsignadoDialog"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:backgroundTint="@color/outline" />
+            android:backgroundTint="@color/outline"
+            android:minHeight="48dp" />
 
         <!-- SECCIÓN DE COLABORACIÓN (Visible solo al editar/abrir detalle de tarea) -->
         <LinearLayout
@@ -184,6 +195,7 @@
                 android:orientation="vertical" />
 
             <LinearLayout
+                android:id="@+id/layoutInputSubtarea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -193,20 +205,23 @@
                 <EditText
                     android:id="@+id/txtNuevaSubtareaDialog"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Nueva subtarea..."
                     android:inputType="textCapSentences"
+                    android:minHeight="48dp"
                     android:textColor="@color/on_surface"
                     android:textSize="13sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAgregarSubtareaDialog"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:backgroundTint="@color/primary_container"
+                    android:maxLines="1"
                     android:minWidth="48dp"
+                    android:minHeight="48dp"
                     android:text="+"
                     android:textColor="@color/on_primary"
                     android:textSize="15sp" />
@@ -235,43 +250,54 @@
                 android:layout_marginTop="6dp"
                 android:orientation="vertical" />
 
-            <EditText
-                android:id="@+id/txtTituloEnlaceDialog"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="4dp"
-                android:hint="Título (Ej. Drive, GitHub, Figma)"
-                android:inputType="textCapSentences"
-                android:textColor="@color/on_surface"
-                android:textSize="13sp" />
-
             <LinearLayout
+                android:id="@+id/layoutInputEnlace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <EditText
-                    android:id="@+id/txtUrlEnlaceDialog"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_weight="1"
-                    android:hint="https://..."
-                    android:inputType="textUri"
+                    android:id="@+id/txtTituloEnlaceDialog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="Título (Ej. Drive, GitHub, Figma)"
+                    android:inputType="textCapSentences"
+                    android:minHeight="48dp"
                     android:textColor="@color/on_surface"
                     android:textSize="13sp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAgregarEnlaceDialog"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="8dp"
-                    android:backgroundTint="@color/primary_container"
-                    android:text="Adjuntar"
-                    android:textAllCaps="false"
-                    android:textColor="@color/on_primary"
-                    android:textSize="12sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/txtUrlEnlaceDialog"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="https://..."
+                        android:inputType="textUri"
+                        android:minHeight="48dp"
+                        android:textColor="@color/on_surface"
+                        android:textSize="13sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAgregarEnlaceDialog"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="@color/primary_container"
+                        android:maxLines="1"
+                        android:minHeight="48dp"
+                        android:text="Adjuntar"
+                        android:textAllCaps="false"
+                        android:textColor="@color/on_primary"
+                        android:textSize="12sp" />
+                </LinearLayout>
             </LinearLayout>
 
             <View
@@ -298,6 +324,7 @@
                 android:orientation="vertical" />
 
             <LinearLayout
+                android:id="@+id/layoutInputComentario"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -307,19 +334,23 @@
                 <EditText
                     android:id="@+id/txtNuevoComentarioDialog"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="Escribe un comentario..."
                     android:inputType="textCapSentences|textMultiLine"
+                    android:maxLines="4"
+                    android:minHeight="48dp"
                     android:textColor="@color/on_surface"
                     android:textSize="13sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEnviarComentarioDialog"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:backgroundTint="@color/primary_container"
+                    android:maxLines="1"
+                    android:minHeight="48dp"
                     android:text="Enviar"
                     android:textAllCaps="false"
                     android:textColor="@color/on_primary"

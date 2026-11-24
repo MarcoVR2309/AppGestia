@@ -366,22 +366,89 @@ public class cTarea {
         return lista;
     }
 
-    // Transacción atómica para actualizar datos de la tarea y gestionar su responsable en Tarea_Responsable
+    // Transacción atómica para actualizar datos de la tarea y gestionar su responsable validando rol en Proyecto_Usuario
     public boolean actualizarTareaYResponsable(Tarea t, String nuevoUsuarioId) {
+        return false;
+    }
+
+    public boolean actualizarTareaYResponsable(Tarea t, String nuevoUsuarioId, String usuarioIdSolicitante) {
         if (t == null || t.getId() == null || t.getId().trim().isEmpty()
-                || t.getTitulo() == null || t.getTitulo().trim().isEmpty()) {
+                || t.getTitulo() == null || t.getTitulo().trim().isEmpty()
+                || usuarioIdSolicitante == null || usuarioIdSolicitante.trim().isEmpty()) {
             return false;
         }
 
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
+        String solicitante = usuarioIdSolicitante.trim();
         try {
             con.setAutoCommit(false);
+
+            String proyectoId = null;
+            try (PreparedStatement psPry = con.prepareStatement("SELECT proyecto_id FROM Tarea WHERE id = ?")) {
+                psPry.setString(1, t.getId().trim());
+                try (ResultSet rsPry = psPry.executeQuery()) {
+                    if (rsPry.next()) {
+                        proyectoId = rsPry.getString("proyecto_id");
+                    }
+                }
+            }
+            if (proyectoId == null || proyectoId.trim().isEmpty()) {
+                con.rollback();
+                con.close();
+                return false;
+            }
+
+            // Consultar el usuario actualmente asignado en Tarea_Responsable
+            String usuarioAnterior = null;
+            boolean solicitanteEsAsignado = false;
+            String sqlActual = "SELECT usuario_id FROM Tarea_Responsable WHERE tarea_id = ?";
+            try (PreparedStatement psAct = con.prepareStatement(sqlActual)) {
+                psAct.setString(1, t.getId().trim());
+                try (ResultSet rsAct = psAct.executeQuery()) {
+                    while (rsAct.next()) {
+                        String resp = rsAct.getString("usuario_id");
+                        if (usuarioAnterior == null) usuarioAnterior = resp;
+                        if (solicitante.equals(resp)) solicitanteEsAsignado = true;
+                    }
+                }
+            }
+
+            String rol = new cEquipo().obtenerRolUsuarioEnProyecto(con, proyectoId, solicitante);
+            boolean esLider = cEquipo.esRolLider(rol);
+            boolean esColabAsignado = cEquipo.esRolColaborador(rol) && solicitanteEsAsignado;
+
+            if (!esLider && !esColabAsignado) {
+                con.rollback();
+                con.close();
+                return false;
+            }
 
             String estadoLimpio = (t.getEstado() != null && !t.getEstado().trim().isEmpty())
                     ? t.getEstado().trim()
                     : "Pendiente";
+
+            // Colaborador asignado: solo puede actualizar el estado (nunca campos estructurales ni responsable)
+            if (!esLider) {
+                String sqlEstado = "UPDATE Tarea SET estado = ?, " +
+                        "fecha_culminacion = CASE WHEN ? = 'Finalizada' THEN SYSUTCDATETIME() ELSE NULL END " +
+                        "WHERE id = ?";
+                try (PreparedStatement psEst = con.prepareStatement(sqlEstado)) {
+                    psEst.setString(1, estadoLimpio);
+                    psEst.setString(2, estadoLimpio);
+                    psEst.setString(3, t.getId().trim());
+                    if (psEst.executeUpdate() <= 0) {
+                        con.rollback();
+                        con.close();
+                        return false;
+                    }
+                }
+                con.commit();
+                con.close();
+                return true;
+            }
+
             String prioridadLimpia = (t.getPrioridad() != null && !t.getPrioridad().trim().isEmpty())
                     ? t.getPrioridad().trim()
                     : "Media";
@@ -415,18 +482,6 @@ public class cTarea {
                     con.rollback();
                     con.close();
                     return false;
-                }
-            }
-
-            // Consultar el usuario actualmente asignado en Tarea_Responsable
-            String usuarioAnterior = null;
-            String sqlActual = "SELECT TOP 1 usuario_id FROM Tarea_Responsable WHERE tarea_id = ?";
-            try (PreparedStatement psAct = con.prepareStatement(sqlActual)) {
-                psAct.setString(1, t.getId().trim());
-                try (ResultSet rsAct = psAct.executeQuery()) {
-                    if (rsAct.next()) {
-                        usuarioAnterior = rsAct.getString("usuario_id");
-                    }
                 }
             }
 
@@ -555,20 +610,57 @@ public class cTarea {
         }
     }
 
-    // Actualización rápida de estado de tarea
+    // Actualización rápida de estado de tarea validando Líder o Colaborador asignado
     public boolean actualizarEstadoTarea(String idTarea, String nuevoEstado) {
+        return false;
+    }
+
+    public boolean actualizarEstadoTarea(String idTarea, String nuevoEstado, String usuarioIdSolicitante) {
+        if (idTarea == null || idTarea.trim().isEmpty()
+                || nuevoEstado == null || nuevoEstado.trim().isEmpty()
+                || usuarioIdSolicitante == null || usuarioIdSolicitante.trim().isEmpty()) {
+            return false;
+        }
+
         Connection con = conexionHelper.conectar();
         if (con == null) return false;
 
-        String sql = "UPDATE Tarea SET estado = ?, fecha_culminacion = CASE WHEN ? = 'Finalizada' THEN SYSUTCDATETIME() ELSE NULL END WHERE id = ?";
-        try (Connection autoCloseCon = con;
-             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+        String solicitante = usuarioIdSolicitante.trim();
+        try (Connection autoCloseCon = con) {
+            String proyectoId = null;
+            try (PreparedStatement psPry = autoCloseCon.prepareStatement("SELECT proyecto_id FROM Tarea WHERE id = ?")) {
+                psPry.setString(1, idTarea.trim());
+                try (ResultSet rsPry = psPry.executeQuery()) {
+                    if (rsPry.next()) {
+                        proyectoId = rsPry.getString("proyecto_id");
+                    }
+                }
+            }
+            if (proyectoId == null || proyectoId.trim().isEmpty()) return false;
 
-            ps.setString(1, nuevoEstado);
-            ps.setString(2, nuevoEstado);
-            ps.setString(3, idTarea);
+            boolean esAsignado = false;
+            try (PreparedStatement psResp = autoCloseCon.prepareStatement(
+                    "SELECT TOP 1 1 FROM Tarea_Responsable WHERE tarea_id = ? AND usuario_id = ?")) {
+                psResp.setString(1, idTarea.trim());
+                psResp.setString(2, solicitante);
+                try (ResultSet rsResp = psResp.executeQuery()) {
+                    esAsignado = rsResp.next();
+                }
+            }
 
-            return ps.executeUpdate() > 0;
+            String rol = new cEquipo().obtenerRolUsuarioEnProyecto(autoCloseCon, proyectoId, solicitante);
+            boolean permitido = cEquipo.esRolLider(rol) || (cEquipo.esRolColaborador(rol) && esAsignado);
+            if (!permitido) {
+                return false;
+            }
+
+            String sql = "UPDATE Tarea SET estado = ?, fecha_culminacion = CASE WHEN ? = 'Finalizada' THEN SYSUTCDATETIME() ELSE NULL END WHERE id = ?";
+            try (PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+                ps.setString(1, nuevoEstado.trim());
+                ps.setString(2, nuevoEstado.trim());
+                ps.setString(3, idTarea.trim());
+                return ps.executeUpdate() > 0;
+            }
         } catch (Exception e) {
             Log.e("CRUD_TAREA", "Error al actualizar estado de tarea: " + e.getMessage());
             return false;

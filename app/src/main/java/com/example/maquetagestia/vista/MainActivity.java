@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void configurarAlertasSegundoPlano() {
-        AlertaVencimientoWorker.crearCanalNotificacion(this);
+        AlertaVencimientoWorker.programarTrabajosAlerta(this, true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -249,22 +249,16 @@ public class MainActivity extends AppCompatActivity {
                     REQ_CODE_NOTIF
             );
         }
+    }
 
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build();
-
-        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(
-                AlertaVencimientoWorker.class,
-                15,
-                TimeUnit.MINUTES
-        ).setConstraints(constraints).build();
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "gestia_alertas_worker",
-                ExistingPeriodicWorkPolicy.KEEP,
-                request
-        );
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions,
+                                           @androidx.annotation.NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_CODE_NOTIF && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            AlertaVencimientoWorker.programarTrabajosAlerta(this, true);
+        }
     }
 
     private void configurarBusquedaGlobal() {

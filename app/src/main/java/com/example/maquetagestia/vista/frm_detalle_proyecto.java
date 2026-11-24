@@ -3,11 +3,6 @@ package com.example.maquetagestia.vista;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -29,12 +24,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.maquetagestia.R;
+import com.example.maquetagestia.controller.GeneradorPdfProyecto;
 import com.example.maquetagestia.controller.Sesion;
+import com.example.maquetagestia.controller.cColaboracionTarea;
 import com.example.maquetagestia.controller.cEquipo;
 import com.example.maquetagestia.controller.cEquipo.MiembroEquipoItem;
 import com.example.maquetagestia.controller.cFase;
 import com.example.maquetagestia.controller.cProyecto;
 import com.example.maquetagestia.controller.cTarea;
+import com.example.maquetagestia.model.EnlaceTarea;
 import com.example.maquetagestia.model.Fase;
 import com.example.maquetagestia.model.Proyecto;
 import com.example.maquetagestia.model.Tarea;
@@ -42,11 +40,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -493,16 +487,19 @@ public class frm_detalle_proyecto extends AppCompatActivity {
     public void exportarReportePdf(View view) {
         if (TextUtils.isEmpty(proyectoId)) return;
         if (view != null) view.setEnabled(false);
-        Toast.makeText(this, "Generando reporte PDF...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Generando reporte PDF ejecutivo...", Toast.LENGTH_SHORT).show();
 
+        final String usuarioEmisor = Sesion.getNombre(this);
         new Thread(() -> {
             Proyecto proyecto = proyectoControlador.obtenerPorId(proyectoId);
             List<Fase> fases = faseControlador.listarPorProyecto(proyectoId);
             List<Tarea> tareas = tareaControlador.listarTareasPorProyecto(proyectoId);
             List<MiembroEquipoItem> equipo = equipoControlador.listarEquipoPorProyecto(proyectoId);
+            List<EnlaceTarea> enlaces = new cColaboracionTarea().listarEnlacesPorProyecto(proyectoId);
 
             if (proyecto == null) {
                 runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
                     if (view != null) view.setEnabled(true);
                     Toast.makeText(this, "No se pudieron obtener los datos del proyecto", Toast.LENGTH_SHORT).show();
                 });
@@ -511,126 +508,25 @@ public class frm_detalle_proyecto extends AppCompatActivity {
 
             File pdfFile = null;
             Exception error = null;
-            PdfDocument document = new PdfDocument();
             try {
-                PdfPageWriter writer = new PdfPageWriter(document);
-                writer.startNewPage();
-
-                Paint pTitulo = new Paint(Paint.ANTI_ALIAS_FLAG);
-                pTitulo.setColor(Color.parseColor("#1A237E"));
-                pTitulo.setTextSize(18f);
-                pTitulo.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-
-                Paint pSubtitulo = new Paint(Paint.ANTI_ALIAS_FLAG);
-                pSubtitulo.setColor(Color.parseColor("#283593"));
-                pSubtitulo.setTextSize(13f);
-                pSubtitulo.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-
-                Paint pTexto = new Paint(Paint.ANTI_ALIAS_FLAG);
-                pTexto.setColor(Color.parseColor("#212121"));
-                pTexto.setTextSize(10.5f);
-
-                Paint pMeta = new Paint(Paint.ANTI_ALIAS_FLAG);
-                pMeta.setColor(Color.parseColor("#616161"));
-                pMeta.setTextSize(9.5f);
-
-                String nombreProy = !TextUtils.isEmpty(proyecto.getNombre()) ? proyecto.getNombre() : "Proyecto";
-                String estadoProy = !TextUtils.isEmpty(proyecto.getEstado()) ? proyecto.getEstado() : "N/A";
-                String tipoProy = !TextUtils.isEmpty(proyecto.getTipo()) ? proyecto.getTipo() : "N/A";
-                String fechaInicio = !TextUtils.isEmpty(proyecto.getFechaInicio()) ? proyecto.getFechaInicio() : "Sin inicio";
-                String fechaFin = !TextUtils.isEmpty(proyecto.getFechaFinEstimada()) ? proyecto.getFechaFinEstimada() : "Sin fin";
-                String descProy = !TextUtils.isEmpty(proyecto.getDescripcion()) ? proyecto.getDescripcion() : "Sin descripción";
-
-                int totalFases = fases != null ? fases.size() : 0;
-                int fasesComp = 0;
-                if (fases != null) {
-                    for (Fase f : fases) {
-                        if ("Completada".equalsIgnoreCase(f.getEstado())) fasesComp++;
-                    }
-                }
-                int pctGlobal = "Finalizado".equalsIgnoreCase(estadoProy) ? 100
-                        : (totalFases > 0 ? (fasesComp * 100) / totalFases : 0);
-
-                String fechaReporte = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date());
-
-                writer.drawWrappedText("GESTIA - REPORTE DE PROYECTO", pTitulo, 22);
-                writer.drawWrappedText("Generado: " + fechaReporte, pMeta, 14);
-                writer.addSpacing(6);
-                writer.drawDivider();
-                writer.addSpacing(8);
-
-                writer.drawWrappedText(nombreProy, pSubtitulo, 18);
-                writer.drawWrappedText("Tipo: " + tipoProy + "  |  Estado: " + estadoProy + "  |  Progreso global: " + pctGlobal + "%", pTexto, 15);
-                writer.drawWrappedText("Fechas: " + fechaInicio + " a " + fechaFin, pTexto, 15);
-                writer.drawWrappedText("Descripción: " + descProy, pMeta, 14);
-                writer.addSpacing(8);
-
-                // Miembros
-                writer.drawWrappedText("1. Equipo del Proyecto (" + (equipo != null ? equipo.size() : 0) + ")", pSubtitulo, 18);
-                writer.drawDivider();
-                writer.addSpacing(4);
-                if (equipo == null || equipo.isEmpty()) {
-                    writer.drawWrappedText("Sin miembros registrados.", pMeta, 14);
-                } else {
-                    for (MiembroEquipoItem m : equipo) {
-                        String nomM = m.usuario != null && !TextUtils.isEmpty(m.usuario.getNombreCompleto())
-                                ? m.usuario.getNombreCompleto() : "Usuario";
-                        String rolM = !TextUtils.isEmpty(m.rol) ? m.rol : "Colaborador";
-                        writer.drawWrappedText("• " + nomM + " — Rol: " + rolM, pTexto, 15);
-                    }
-                }
-                writer.addSpacing(10);
-
-                // Fases
-                writer.drawWrappedText("2. Fases del Proyecto (" + totalFases + ")", pSubtitulo, 18);
-                writer.drawDivider();
-                writer.addSpacing(4);
-                if (fases == null || fases.isEmpty()) {
-                    writer.drawWrappedText("Sin fases registradas.", pMeta, 14);
-                } else {
-                    for (Fase f : fases) {
-                        String fFecha = !TextUtils.isEmpty(f.getFechaEstimada()) ? " | Est: " + f.getFechaEstimada() : "";
-                        String fEst = !TextUtils.isEmpty(f.getEstado()) ? f.getEstado() : "Pendiente";
-                        writer.drawWrappedText("• " + f.getOrden() + ". " + f.getNombre() + " [" + fEst + "]" + fFecha, pTexto, 15);
-                    }
-                }
-                writer.addSpacing(10);
-
-                // Tareas
-                int totalTareas = tareas != null ? tareas.size() : 0;
-                writer.drawWrappedText("3. Tareas del Proyecto (" + totalTareas + ")", pSubtitulo, 18);
-                writer.drawDivider();
-                writer.addSpacing(4);
-                if (tareas == null || tareas.isEmpty()) {
-                    writer.drawWrappedText("Sin tareas registradas.", pMeta, 14);
-                } else {
-                    for (Tarea t : tareas) {
-                        String tEst = !TextUtils.isEmpty(t.getEstado()) ? t.getEstado() : "Pendiente";
-                        String tPrio = !TextUtils.isEmpty(t.getPrioridad()) ? t.getPrioridad() : "Media";
-                        String tFecha = !TextUtils.isEmpty(t.getFechaLimite()) ? t.getFechaLimite() : "Sin límite";
-                        String tResp = !TextUtils.isEmpty(t.getResponsableNombre()) ? t.getResponsableNombre() : "Sin asignar";
-                        writer.drawWrappedText("• " + t.getTitulo() + " [" + tEst + "]", pTexto, 14);
-                        writer.drawWrappedText("   Prioridad: " + tPrio + " | Límite: " + tFecha + " | Responsable: " + tResp, pMeta, 14);
-                    }
-                }
-
-                writer.finish();
-
-                String safeId = proyectoId.replaceAll("[^a-zA-Z0-9_-]", "_");
-                pdfFile = new File(getCacheDir(), "Reporte_" + safeId + ".pdf");
-                try (FileOutputStream fos = new FileOutputStream(pdfFile)) {
-                    document.writeTo(fos);
-                }
+                pdfFile = GeneradorPdfProyecto.generarReporteProyecto(
+                        this,
+                        proyecto,
+                        fases,
+                        tareas,
+                        equipo,
+                        enlaces,
+                        usuarioEmisor
+                );
             } catch (Exception e) {
                 error = e;
-            } finally {
-                document.close();
             }
 
             File finalPdf = pdfFile;
             Exception finalError = error;
             String nombreParaAsunto = !TextUtils.isEmpty(proyecto.getNombre()) ? proyecto.getNombre() : "Proyecto";
             runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
                 if (view != null) view.setEnabled(true);
                 if (finalError != null || finalPdf == null || !finalPdf.exists()) {
                     Toast.makeText(this, "Error al generar PDF", Toast.LENGTH_LONG).show();
@@ -649,108 +545,5 @@ public class frm_detalle_proyecto extends AppCompatActivity {
                 }
             });
         }).start();
-    }
-
-    private static class PdfPageWriter {
-        private static final int PAGE_WIDTH = 595;
-        private static final int PAGE_HEIGHT = 842;
-        private static final int MARGIN_X = 40;
-        private static final int MAX_WIDTH = 515;
-        private static final int MARGIN_BOTTOM = 790;
-
-        private final PdfDocument doc;
-        private final Paint footerPaint;
-        private final Paint dividerPaint;
-        private PdfDocument.Page currentPage;
-        private Canvas canvas;
-        private int pageNum = 0;
-        private int y = 48;
-
-        PdfPageWriter(PdfDocument doc) {
-            this.doc = doc;
-            this.footerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            this.footerPaint.setColor(Color.parseColor("#9E9E9E"));
-            this.footerPaint.setTextSize(8.5f);
-
-            this.dividerPaint = new Paint();
-            this.dividerPaint.setColor(Color.parseColor("#CFD8DC"));
-            this.dividerPaint.setStrokeWidth(1f);
-        }
-
-        void startNewPage() {
-            if (currentPage != null) {
-                doc.finishPage(currentPage);
-            }
-            pageNum++;
-            PdfDocument.PageInfo info = new PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pageNum).create();
-            currentPage = doc.startPage(info);
-            canvas = currentPage.getCanvas();
-            canvas.drawText("Gestia - Página " + pageNum, MARGIN_X, 820, footerPaint);
-            y = 48;
-        }
-
-        void ensureSpace(int neededPx) {
-            if (currentPage == null || y + neededPx > MARGIN_BOTTOM) {
-                startNewPage();
-            }
-        }
-
-        void addSpacing(int px) {
-            y += px;
-        }
-
-        void drawDivider() {
-            ensureSpace(8);
-            canvas.drawLine(MARGIN_X, y, MARGIN_X + MAX_WIDTH, y, dividerPaint);
-            y += 6;
-        }
-
-        void drawWrappedText(String text, Paint paint, int lineHeight) {
-            if (text == null) return;
-            String[] paragraphs = text.split("\\r?\\n");
-            for (String para : paragraphs) {
-                if (para.isEmpty()) {
-                    ensureSpace(lineHeight);
-                    y += lineHeight;
-                    continue;
-                }
-                List<String> lines = wrapParagraph(para, paint);
-                for (String line : lines) {
-                    ensureSpace(lineHeight);
-                    canvas.drawText(line, MARGIN_X, y, paint);
-                    y += lineHeight;
-                }
-            }
-        }
-
-        private List<String> wrapParagraph(String para, Paint paint) {
-            List<String> out = new ArrayList<>();
-            int start = 0;
-            int len = para.length();
-            while (start < len) {
-                int count = paint.breakText(para, start, len, true, MAX_WIDTH, null);
-                if (count <= 0) break;
-                int end = start + count;
-                if (end < len && para.charAt(end) != ' ') {
-                    int lastSpace = para.lastIndexOf(' ', end);
-                    if (lastSpace > start) {
-                        end = lastSpace + 1;
-                    }
-                }
-                out.add(para.substring(start, end).trim());
-                start = end;
-                while (start < len && para.charAt(start) == ' ') {
-                    start++;
-                }
-            }
-            return out;
-        }
-
-        void finish() {
-            if (currentPage != null) {
-                doc.finishPage(currentPage);
-                currentPage = null;
-            }
-        }
     }
 }

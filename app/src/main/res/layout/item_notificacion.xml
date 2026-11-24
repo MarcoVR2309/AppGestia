@@ -42,8 +42,10 @@
 
                 <TextView
                     android:id="@+id/lblTituloNotif"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
                     android:text="Título de notificación"
                     android:textColor="@color/on_surface"
                     android:textSize="15sp"
@@ -51,7 +53,7 @@
 
                 <TextView
                     android:id="@+id/lblMensajeNotif"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Mensaje de la notificación"
@@ -90,8 +92,10 @@
                 android:id="@+id/btnRechazarInvitacion"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:maxLines="1"
+                android:minHeight="40dp"
                 android:text="Rechazar"
                 android:textAllCaps="false"
                 android:textColor="@color/error"
@@ -103,10 +107,12 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAceptarInvitacion"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="10dp"
                 android:backgroundTint="@color/primary_container"
+                android:maxLines="1"
+                android:minHeight="40dp"
                 android:text="Aceptar"
                 android:textAllCaps="false"
                 android:textColor="@color/on_primary"

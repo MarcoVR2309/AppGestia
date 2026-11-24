@@ -28,9 +28,15 @@
             app:tint="@color/primary" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="8dp"
+            android:layout_toStartOf="@id/btnConfiguracion"
+            android:layout_toEndOf="@id/btnVolverPerfil"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
             android:text="Perfil"
             android:textColor="@color/primary"
             android:textSize="20sp"
@@ -49,18 +55,21 @@
             app:tint="@color/primary" />
     </RelativeLayout>
 
-    <!-- 2. CONTENIDO DESPLAZABLE (ScrollView) -->
-    <ScrollView
+    <!-- 2. CONTENIDO DESPLAZABLE (NestedScrollView) -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/headerPerfil"
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
             <!-- FOTO Y DATOS DEL USUARIO -->
             <LinearLayout
@@ -80,9 +89,12 @@
 
                 <TextView
                     android:id="@+id/tvNombreUsuario"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="2"
                     android:textColor="@color/on_surface"
                     android:textSize="20sp"
                     android:textStyle="bold"
@@ -90,9 +102,12 @@
 
                 <TextView
                     android:id="@+id/tvEmailUsuario"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="2"
                     android:textColor="@color/on_surface_variant"
                     android:textSize="14sp"
                     tools:text="correo@gestia.edu" />
@@ -267,9 +282,10 @@
                 android:id="@+id/btnCerrarSesion"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
+                android:minHeight="48dp"
                 android:onClick="cerrarSesion"
                 android:text="Cerrar sesión"
                 android:textAllCaps="false"
@@ -280,6 +296,6 @@
                 app:strokeColor="@color/on_error" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>

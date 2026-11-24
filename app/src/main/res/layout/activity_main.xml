@@ -13,12 +13,13 @@
         android:id="@+id/headerTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp">
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:layout_marginEnd="8dp"
             android:layout_toStartOf="@id/btnCalendarioHome"
             android:orientation="vertical">
 
@@ -26,6 +27,8 @@
                 android:id="@+id/tvGreeting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Hola 👋"
                 android:textColor="@color/primary"
                 android:textSize="22sp"
@@ -76,13 +79,16 @@
         android:layout_height="match_parent"
         android:layout_above="@id/bottomNavigation"
         android:layout_below="@id/headerTop"
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
             <!-- BÚSQUEDA GLOBAL RÁPIDA -->
             <com.google.android.material.card.MaterialCardView
@@ -97,7 +103,7 @@
                 <EditText
                     android:id="@+id/txtBusquedaGlobal"
                     android:layout_width="match_parent"
-                    android:layout_height="46dp"
+                    android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:drawableStart="@drawable/ic_search"
                     android:drawablePadding="10dp"
@@ -105,6 +111,7 @@
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:maxLines="1"
+                    android:minHeight="48dp"
                     android:paddingHorizontal="14dp"
                     android:textColor="@color/on_surface"
                     android:textColorHint="@color/on_surface_variant"
@@ -197,6 +204,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
                             android:text="Proyectos Activos"
                             android:textColor="@color/on_surface_variant"
                             android:textSize="11sp" />
@@ -242,6 +251,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
                             android:text="Tareas Asignadas"
                             android:textColor="@color/on_surface_variant"
                             android:textSize="11sp" />
@@ -287,6 +298,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
                             android:text="Completadas"
                             android:textColor="@color/on_surface_variant"
                             android:textSize="11sp" />
@@ -332,6 +345,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
                             android:text="Pendientes"
                             android:textColor="@color/on_surface_variant"
                             android:textSize="11sp" />
@@ -422,12 +437,14 @@
     <LinearLayout
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/surface_container_lowest"
         android:elevation="8dp"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:minHeight="60dp"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
 
         <ImageView
             android:id="@+id/btnHomeNav"

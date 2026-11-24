@@ -8,6 +8,8 @@ import com.example.maquetagestia.model.DashboardDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class cDashboard {
 
@@ -132,6 +134,90 @@ public class cDashboard {
             Log.e("CRUD_DASHBOARD", "Error al obtener estadísticas detalladas: " + e.getMessage());
         }
 
+        return dto;
+    }
+
+    public static class ProyectoParticipacionItem {
+        public final String proyectoId;
+        public final String nombreProyecto;
+        public final String rol;
+
+        public ProyectoParticipacionItem(String proyectoId, String nombreProyecto, String rol) {
+            this.proyectoId = proyectoId;
+            this.nombreProyecto = nombreProyecto;
+            this.rol = rol;
+        }
+
+        @Override
+        public String toString() {
+            String nombre = nombreProyecto != null ? nombreProyecto : "Proyecto";
+            String rolMostrar = cEquipo.esRolLider(rol) ? "Líder" : (rol != null ? rol : "Colaborador");
+            return nombre + " (" + rolMostrar + ")";
+        }
+    }
+
+    public List<ProyectoParticipacionItem> listarProyectosConRolPorUsuario(String idUsuario) {
+        List<ProyectoParticipacionItem> lista = new ArrayList<>();
+        if (idUsuario == null || idUsuario.trim().isEmpty()) return lista;
+
+        Connection con = conexionHelper.conectar();
+        if (con == null) return lista;
+
+        String sql = "SELECT p.id, p.nombre, pu.rol " +
+                     "FROM Proyecto p " +
+                     "INNER JOIN Proyecto_Usuario pu ON p.id = pu.proyecto_id " +
+                     "WHERE pu.usuario_id = ? " +
+                     "ORDER BY p.created_at DESC";
+
+        try (Connection autoCloseCon = con;
+             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+            ps.setString(1, idUsuario.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new ProyectoParticipacionItem(
+                            rs.getString("id"),
+                            rs.getString("nombre"),
+                            rs.getString("rol")
+                    ));
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_DASHBOARD", "Error al listar proyectos del usuario: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public EstadisticasDTO obtenerEstadisticasGeneralesProyecto(String idProyecto) {
+        EstadisticasDTO dto = new EstadisticasDTO();
+        if (idProyecto == null || idProyecto.trim().isEmpty()) return dto;
+
+        Connection con = conexionHelper.conectar();
+        if (con == null) return dto;
+
+        String sql = "SELECT COUNT(*) AS total, " +
+                     "ISNULL(SUM(CASE WHEN t.estado = 'Finalizada' THEN 1 ELSE 0 END), 0) AS completadas, " +
+                     "ISNULL(SUM(CASE WHEN t.estado IN ('Pendiente', 'EnProgreso') THEN 1 ELSE 0 END), 0) AS pendientes, " +
+                     "ISNULL(SUM(CASE WHEN t.estado != 'Finalizada' AND t.fecha_limite IS NOT NULL AND CAST(t.fecha_limite AS DATE) < CAST(GETDATE() AS DATE) THEN 1 ELSE 0 END), 0) AS vencidas " +
+                     "FROM Tarea t " +
+                     "WHERE t.proyecto_id = ?";
+
+        try (Connection autoCloseCon = con;
+             PreparedStatement ps = autoCloseCon.prepareStatement(sql)) {
+            ps.setString(1, idProyecto.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    dto.totalAsignadas = rs.getInt("total");
+                    dto.completadas = rs.getInt("completadas");
+                    dto.pendientes = rs.getInt("pendientes");
+                    dto.vencidas = rs.getInt("vencidas");
+                    dto.porcentajeCumplimiento = dto.totalAsignadas > 0
+                            ? (dto.completadas * 100) / dto.totalAsignadas
+                            : 0;
+                }
+            }
+        } catch (Exception e) {
+            Log.e("CRUD_DASHBOARD", "Error al obtener estadísticas del proyecto: " + e.getMessage());
+        }
         return dto;
     }
 }

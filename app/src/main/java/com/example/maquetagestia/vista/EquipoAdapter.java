@@ -114,7 +114,7 @@ public class EquipoAdapter extends RecyclerView.Adapter<EquipoAdapter.EquipoView
 
         if (cEquipo.esRolLider(item.rol)) {
             spRol.setSelection(0);
-        } else if ("Observador".equalsIgnoreCase(item.rol)) {
+        } else if (cEquipo.esRolObservador(item.rol)) {
             spRol.setSelection(2);
         } else {
             spRol.setSelection(1);

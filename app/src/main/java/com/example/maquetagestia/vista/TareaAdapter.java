@@ -137,7 +137,7 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
             holder.btnEstado.setColorFilter(ContextCompat.getColor(context, R.color.outline));
         }
 
-        // Cambiar estado rápido (solo Líder o responsable asignado)
+        // Cambiar estado rápido (solo Líder o colaborador asignado)
         holder.btnEstado.setOnClickListener(v -> {
             int adapterPos = holder.getBindingAdapterPosition();
             if (adapterPos == RecyclerView.NO_POSITION) return;
@@ -147,17 +147,20 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
             String nuevoEstado = "Finalizada".equalsIgnoreCase(t.getEstado()) ? "Pendiente" : "Finalizada";
 
             new Thread(() -> {
-                boolean esResponsable = !TextUtils.isEmpty(idUsuarioActual) && idUsuarioActual.equals(respActualId);
-                boolean esLider = !TextUtils.isEmpty(idUsuarioActual) && !TextUtils.isEmpty(t.getProyectoId())
-                        && equipoControlador.esLiderDelProyecto(t.getProyectoId(), idUsuarioActual);
-                if (!esResponsable && !esLider) {
+                String rol = (!TextUtils.isEmpty(idUsuarioActual) && !TextUtils.isEmpty(t.getProyectoId()))
+                        ? equipoControlador.obtenerRolUsuarioEnProyecto(t.getProyectoId(), idUsuarioActual)
+                        : null;
+                boolean esLider = cEquipo.esRolLider(rol);
+                boolean esColabAsignado = cEquipo.esRolColaborador(rol)
+                        && !TextUtils.isEmpty(idUsuarioActual) && idUsuarioActual.equals(respActualId);
+                if (!esLider && !esColabAsignado) {
                     ejecutarEnUi(() -> Toast.makeText(context,
-                            "Solo el líder o el responsable asignado pueden cambiar el estado",
+                            "Solo el líder o el colaborador asignado pueden cambiar el estado",
                             Toast.LENGTH_SHORT).show());
                     return;
                 }
 
-                boolean exito = tareaControlador.actualizarEstadoTarea(t.getId(), nuevoEstado);
+                boolean exito = tareaControlador.actualizarEstadoTarea(t.getId(), nuevoEstado, idUsuarioActual);
                 if (exito) {
                     ejecutarEnUi(() -> {
                         t.setEstado(nuevoEstado);
@@ -187,24 +190,32 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
 
         LinearLayout layoutColaboracion = dialogView.findViewById(R.id.layoutColaboracionTarea);
         LinearLayout containerSubtareas = dialogView.findViewById(R.id.containerSubtareas);
+        LinearLayout layoutInputSubtarea = dialogView.findViewById(R.id.layoutInputSubtarea);
         EditText txtNuevaSubtarea = dialogView.findViewById(R.id.txtNuevaSubtareaDialog);
         MaterialButton btnAgregarSubtarea = dialogView.findViewById(R.id.btnAgregarSubtareaDialog);
         LinearLayout containerEnlaces = dialogView.findViewById(R.id.containerEnlaces);
+        LinearLayout layoutInputEnlace = dialogView.findViewById(R.id.layoutInputEnlace);
         EditText txtTituloEnlace = dialogView.findViewById(R.id.txtTituloEnlaceDialog);
         EditText txtUrlEnlace = dialogView.findViewById(R.id.txtUrlEnlaceDialog);
         MaterialButton btnAgregarEnlace = dialogView.findViewById(R.id.btnAgregarEnlaceDialog);
         LinearLayout containerComentarios = dialogView.findViewById(R.id.containerComentarios);
+        LinearLayout layoutInputComentario = dialogView.findViewById(R.id.layoutInputComentario);
         EditText txtNuevoComentario = dialogView.findViewById(R.id.txtNuevoComentarioDialog);
         MaterialButton btnEnviarComentario = dialogView.findViewById(R.id.btnEnviarComentarioDialog);
 
-        // Mostrar selector de estado y sección de colaboración en modo edición
+        // Mostrar selector de estado y sección de colaboración en modo edición (inputs ocultos hasta verificar rol)
         lblEstado.setVisibility(View.VISIBLE);
         spEstado.setVisibility(View.VISIBLE);
         layoutColaboracion.setVisibility(View.VISIBLE);
+        layoutInputSubtarea.setVisibility(View.GONE);
+        layoutInputEnlace.setVisibility(View.GONE);
+        layoutInputComentario.setVisibility(View.GONE);
 
         final String idUsuarioActual = Sesion.getIdUsuario(context);
         final boolean[] esLiderRef = {false};
-        final boolean[] esResponsableRef = {false};
+        final boolean[] esColabAsignadoRef = {false};
+        final boolean[] puedeMarcarSubRef = {false};
+        final boolean[] puedeComentarRef = {false};
 
         final String fechaOriginal = tarea.getFechaLimite() != null ? tarea.getFechaLimite().trim() : "";
 
@@ -320,7 +331,8 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
             ejecutarEnUi(() -> {
                 if (!dialog.isShowing()) return;
                 actualizarContadorSubtareasEnTarjeta(tarea, subtareas);
-                renderizarSubtareas(containerSubtareas, subtareas, tarea, esLiderRef[0], () -> {
+                renderizarSubtareas(containerSubtareas, subtareas, tarea,
+                        puedeMarcarSubRef[0], esLiderRef[0], idUsuarioActual, () -> {
                     int idx = listaTareas.indexOf(tarea);
                     if (idx >= 0) notifyItemChanged(idx);
                 }, recargarSubtareasHolder[0]);
@@ -333,7 +345,7 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
             ejecutarEnUi(() -> {
                 if (!dialog.isShowing()) return;
                 renderizarEnlaces(containerEnlaces, enlaces, idUsuarioActual, esLiderRef[0],
-                        tarea.getProyectoId(), recargarEnlacesHolder[0]);
+                        esColabAsignadoRef[0], tarea.getProyectoId(), recargarEnlacesHolder[0]);
             });
         }).start();
 
@@ -347,14 +359,19 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
         }).start();
 
         btnAgregarSubtarea.setOnClickListener(v -> {
+            if (!esLiderRef[0]) {
+                Toast.makeText(context, "Solo el líder del proyecto puede crear subtareas", Toast.LENGTH_SHORT).show();
+                return;
+            }
             String tituloSub = txtNuevaSubtarea.getText() != null ? txtNuevaSubtarea.getText().toString().trim() : "";
             if (TextUtils.isEmpty(tituloSub)) {
                 Toast.makeText(context, "Escribe el título de la subtarea", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (TextUtils.isEmpty(idUsuarioActual)) return;
             btnAgregarSubtarea.setEnabled(false);
             new Thread(() -> {
-                boolean ok = colabControlador.crearSubtarea(tarea.getId(), tituloSub);
+                boolean ok = colabControlador.crearSubtarea(tarea.getId(), tituloSub, idUsuarioActual);
                 ejecutarEnUi(() -> {
                     btnAgregarSubtarea.setEnabled(true);
                     if (ok) {
@@ -368,6 +385,10 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
         });
 
         btnAgregarEnlace.setOnClickListener(v -> {
+            if (!esLiderRef[0] && !esColabAsignadoRef[0]) {
+                Toast.makeText(context, "No tienes permiso para adjuntar enlaces en esta tarea", Toast.LENGTH_SHORT).show();
+                return;
+            }
             String tituloEnl = txtTituloEnlace.getText() != null ? txtTituloEnlace.getText().toString().trim() : "";
             String urlEnl = txtUrlEnlace.getText() != null ? txtUrlEnlace.getText().toString().trim() : "";
             if (!urlEnl.startsWith("http://") && !urlEnl.startsWith("https://")) {
@@ -392,6 +413,10 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
         });
 
         btnEnviarComentario.setOnClickListener(v -> {
+            if (!puedeComentarRef[0]) {
+                Toast.makeText(context, "Los observadores están en modo solo lectura", Toast.LENGTH_SHORT).show();
+                return;
+            }
             String textoCom = txtNuevoComentario.getText() != null ? txtNuevoComentario.getText().toString().trim() : "";
             if (TextUtils.isEmpty(textoCom)) {
                 Toast.makeText(context, "Escribe un comentario", Toast.LENGTH_SHORT).show();
@@ -416,8 +441,9 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
         new Thread(() -> {
             List<Fase> fases = faseControlador.listarPorProyecto(tarea.getProyectoId());
             List<MiembroEquipoItem> equipo = equipoControlador.listarEquipoPorProyecto(tarea.getProyectoId());
-            boolean esLider = !TextUtils.isEmpty(idUsuarioActual) && !TextUtils.isEmpty(tarea.getProyectoId())
-                    && equipoControlador.esLiderDelProyecto(tarea.getProyectoId(), idUsuarioActual);
+            String rolUsuario = (!TextUtils.isEmpty(idUsuarioActual) && !TextUtils.isEmpty(tarea.getProyectoId()))
+                    ? equipoControlador.obtenerRolUsuarioEnProyecto(tarea.getProyectoId(), idUsuarioActual)
+                    : null;
             List<Subtarea> subtareas = colabControlador.listarSubtareasPorTarea(tarea.getId());
             List<EnlaceTarea> enlaces = colabControlador.listarEnlacesPorTarea(tarea.getId());
             List<ComentarioTarea> comentarios = colabControlador.listarComentariosPorTarea(tarea.getId());
@@ -461,9 +487,19 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
                 spAsignado.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, nombresMiembros));
                 spAsignado.setSelection(respSelIndex);
 
-                boolean esResponsable = !TextUtils.isEmpty(idUsuarioActual) && idUsuarioActual.equals(respActualId);
+                boolean esLider = cEquipo.esRolLider(rolUsuario);
+                boolean esObservador = (rolUsuario == null || cEquipo.esRolObservador(rolUsuario));
+                boolean esColaborador = !esLider && !esObservador;
+                boolean esAsignado = !TextUtils.isEmpty(idUsuarioActual) && idUsuarioActual.equals(respActualId);
+                boolean esColabAsignado = esColaborador && esAsignado;
+                boolean puedeMarcarSub = esLider || esColabAsignado;
+                boolean puedeAgregarEnlace = esLider || esColabAsignado;
+                boolean puedeComentar = esLider || esColaborador;
+
                 esLiderRef[0] = esLider;
-                esResponsableRef[0] = esResponsable;
+                esColabAsignadoRef[0] = esColabAsignado;
+                puedeMarcarSubRef[0] = puedeMarcarSub;
+                puedeComentarRef[0] = puedeComentar;
 
                 if (!esLider) {
                     txtTitulo.setEnabled(false);
@@ -474,14 +510,17 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
                     spFase.setEnabled(false);
                     spAsignado.setEnabled(false);
                     dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(View.GONE);
-                    spEstado.setEnabled(esResponsable);
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setVisibility(esResponsable ? View.VISIBLE : View.GONE);
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(esResponsable);
-                    if (!esResponsable) {
-                        txtNuevaSubtarea.setEnabled(false);
-                        btnAgregarSubtarea.setEnabled(false);
-                    }
+                    layoutInputSubtarea.setVisibility(View.GONE);
+                    layoutInputEnlace.setVisibility(puedeAgregarEnlace ? View.VISIBLE : View.GONE);
+                    layoutInputComentario.setVisibility(puedeComentar ? View.VISIBLE : View.GONE);
+
+                    spEstado.setEnabled(esColabAsignado);
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setVisibility(esColabAsignado ? View.VISIBLE : View.GONE);
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(esColabAsignado);
                 } else {
+                    layoutInputSubtarea.setVisibility(View.VISIBLE);
+                    layoutInputEnlace.setVisibility(View.VISIBLE);
+                    layoutInputComentario.setVisibility(View.VISIBLE);
                     dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(View.VISIBLE);
                     dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(true);
                     dialog.getButton(AlertDialog.BUTTON_POSITIVE).setVisibility(View.VISIBLE);
@@ -489,12 +528,13 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
                 }
 
                 actualizarContadorSubtareasEnTarjeta(tarea, subtareas);
-                renderizarSubtareas(containerSubtareas, subtareas, tarea, esLider, () -> {
+                renderizarSubtareas(containerSubtareas, subtareas, tarea,
+                        puedeMarcarSub, esLider, idUsuarioActual, () -> {
                     int idx = listaTareas.indexOf(tarea);
                     if (idx >= 0) notifyItemChanged(idx);
                 }, recargarSubtareasHolder[0]);
                 renderizarEnlaces(containerEnlaces, enlaces, idUsuarioActual, esLider,
-                        tarea.getProyectoId(), recargarEnlacesHolder[0]);
+                        esColabAsignado, tarea.getProyectoId(), recargarEnlacesHolder[0]);
                 renderizarComentarios(containerComentarios, comentarios);
             });
         }).start();
@@ -502,15 +542,15 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String nuevoEstado = spEstado.getSelectedItem().toString();
 
-            // Colaborador responsable solo puede cambiar el estado de su tarea asignada
+            // Colaborador asignado: solo puede actualizar estado sobre su propia tarea
             if (!esLiderRef[0]) {
-                if (!esResponsableRef[0]) {
+                if (!esColabAsignadoRef[0]) {
                     Toast.makeText(context, "No tienes permiso para modificar esta tarea", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                 new Thread(() -> {
-                    boolean exito = tareaControlador.actualizarEstadoTarea(tarea.getId(), nuevoEstado);
+                    boolean exito = tareaControlador.actualizarEstadoTarea(tarea.getId(), nuevoEstado, idUsuarioActual);
                     ejecutarEnUi(() -> {
                         if (exito) {
                             tarea.setEstado(nuevoEstado);
@@ -566,7 +606,7 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
             new Thread(() -> {
-                boolean exito = tareaControlador.actualizarTareaYResponsable(tareaEditada, nuevoResponsableId);
+                boolean exito = tareaControlador.actualizarTareaYResponsable(tareaEditada, nuevoResponsableId, idUsuarioActual);
                 ejecutarEnUi(() -> {
                     if (exito) {
                         tarea.setFaseId(nuevaFaseId);
@@ -608,7 +648,8 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
     }
 
     private void renderizarSubtareas(LinearLayout container, List<Subtarea> subtareas, Tarea tarea,
-                                    boolean puedeEliminar, Runnable onCountChanged, Runnable recargar) {
+                                    boolean puedeMarcar, boolean puedeEliminar,
+                                    String idUsuarioActual, Runnable onCountChanged, Runnable recargar) {
         container.removeAllViews();
         if (subtareas == null || subtareas.isEmpty()) {
             TextView tvVacio = new TextView(context);
@@ -637,43 +678,46 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
             cb.setTextColor(ContextCompat.getColor(context,
                     s.isCompletada() ? R.color.on_surface_variant : R.color.on_surface));
             cb.setChecked(s.isCompletada());
+            cb.setEnabled(puedeMarcar);
             if (s.isCompletada()) {
                 cb.setPaintFlags(cb.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             }
 
-            final boolean[] ignorarCambio = {false};
-            cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (ignorarCambio[0]) return;
-                cb.setEnabled(false);
-                new Thread(() -> {
-                    boolean ok = colabControlador.actualizarEstadoSubtarea(s.getId(), isChecked);
-                    ejecutarEnUi(() -> {
-                        cb.setEnabled(true);
-                        if (ok) {
-                            s.setCompletada(isChecked);
-                            cb.setTextColor(ContextCompat.getColor(context,
-                                    isChecked ? R.color.on_surface_variant : R.color.on_surface));
-                            if (isChecked) {
-                                cb.setPaintFlags(cb.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            if (puedeMarcar) {
+                final boolean[] ignorarCambio = {false};
+                cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    if (ignorarCambio[0]) return;
+                    cb.setEnabled(false);
+                    new Thread(() -> {
+                        boolean ok = colabControlador.actualizarEstadoSubtarea(s.getId(), isChecked, idUsuarioActual);
+                        ejecutarEnUi(() -> {
+                            cb.setEnabled(true);
+                            if (ok) {
+                                s.setCompletada(isChecked);
+                                cb.setTextColor(ContextCompat.getColor(context,
+                                        isChecked ? R.color.on_surface_variant : R.color.on_surface));
+                                if (isChecked) {
+                                    cb.setPaintFlags(cb.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                                } else {
+                                    cb.setPaintFlags(cb.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                                }
+                                int comp = 0;
+                                for (Subtarea item : subtareas) {
+                                    if (item.isCompletada()) comp++;
+                                }
+                                tarea.setTotalSubtareas(subtareas.size());
+                                tarea.setSubtareasCompletadas(comp);
+                                if (onCountChanged != null) onCountChanged.run();
                             } else {
-                                cb.setPaintFlags(cb.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                                ignorarCambio[0] = true;
+                                cb.setChecked(!isChecked);
+                                ignorarCambio[0] = false;
+                                Toast.makeText(context, "Error al actualizar subtarea", Toast.LENGTH_SHORT).show();
                             }
-                            int comp = 0;
-                            for (Subtarea item : subtareas) {
-                                if (item.isCompletada()) comp++;
-                            }
-                            tarea.setTotalSubtareas(subtareas.size());
-                            tarea.setSubtareasCompletadas(comp);
-                            if (onCountChanged != null) onCountChanged.run();
-                        } else {
-                            ignorarCambio[0] = true;
-                            cb.setChecked(!isChecked);
-                            ignorarCambio[0] = false;
-                            Toast.makeText(context, "Error al actualizar subtarea", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }).start();
-            });
+                        });
+                    }).start();
+                });
+            }
             row.addView(cb);
 
             if (puedeEliminar && recargar != null) {
@@ -683,7 +727,7 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
                 btnDel.setTextColor(ContextCompat.getColor(context, R.color.error));
                 btnDel.setPadding(dpToPx(8), dpToPx(4), dpToPx(4), dpToPx(4));
                 btnDel.setOnClickListener(v -> new Thread(() -> {
-                    boolean ok = colabControlador.eliminarSubtarea(s.getId());
+                    boolean ok = colabControlador.eliminarSubtarea(s.getId(), idUsuarioActual);
                     ejecutarEnUi(() -> {
                         if (ok) {
                             recargar.run();
@@ -700,6 +744,7 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
 
     private void renderizarEnlaces(LinearLayout container, List<EnlaceTarea> enlaces,
                                  String idUsuarioActual, boolean esLider,
+                                 boolean puedeEliminarPropios,
                                  String proyectoId, Runnable recargar) {
         container.removeAllViews();
         if (enlaces == null || enlaces.isEmpty()) {
@@ -758,7 +803,7 @@ public class TareaAdapter extends RecyclerView.Adapter<TareaAdapter.TareaViewHol
             card.addView(info);
 
             boolean esAutor = !TextUtils.isEmpty(idUsuarioActual) && idUsuarioActual.equals(e.getUsuarioId());
-            if ((esLider || esAutor) && recargar != null) {
+            if ((esLider || (puedeEliminarPropios && esAutor)) && recargar != null) {
                 TextView btnDel = new TextView(context);
                 btnDel.setText("✕");
                 btnDel.setTextSize(14);
